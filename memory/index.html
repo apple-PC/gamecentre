@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>记忆翻牌 · 课间游戏中心</title>
+<meta name="theme-color" content="#f5f5f7">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<style>
+:root{--accent:#af52de}
+
+:root{--bg:#f5f5f7;--paper:#fff;--ink:#1d1d1f;--ink2:#6e6e73;--ink3:#9a9a9e;
+--line:rgba(0,0,0,.09);--accent:#0a84ff;--shadow:0 18px 50px -28px rgba(0,0,0,.28);--r:20px}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC","Microsoft YaHei",sans-serif;
+-webkit-font-smoothing:antialiased;min-height:100vh;line-height:1.5}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+.top{position:sticky;top:0;z-index:20;background:rgba(245,245,247,.8);
+backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);
+border-bottom:1px solid var(--line)}
+.top-in{max-width:640px;margin:0 auto;padding:0 18px;height:52px;display:flex;align-items:center;gap:12px}
+.back{display:inline-flex;align-items:center;gap:6px;color:var(--ink2);font-size:14px;transition:color .2s}
+.back:hover{color:var(--ink)}
+.back svg{width:16px;height:16px}
+.top .name{font-weight:650;font-size:16px;letter-spacing:-.2px}
+.top .spacer{flex:1}
+.top .badge{font-size:11px;color:var(--ink3);border:1px solid var(--line);padding:4px 10px;border-radius:999px}
+.stage{max-width:640px;margin:0 auto;padding:22px 18px 60px}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:20px}
+.hud{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:0 0 18px}
+.hud .cell{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:8px 16px;text-align:center;min-width:86px}
+.hud .cell .k{font-size:11px;color:var(--ink3);letter-spacing:.4px}
+.hud .cell .v{font-size:20px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+.controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.btn{border:none;background:var(--ink);color:#fff;padding:11px 20px;border-radius:999px;font-size:14px;font-weight:600;transition:transform .15s,opacity .15s}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:scale(.97)}
+.btn.sec{background:#e8e8ed;color:var(--ink)}
+.tips{margin-top:16px;text-align:center;color:var(--ink3);font-size:12.5px;line-height:1.7}
+.msg{text-align:center;font-size:15px;color:var(--ink2);margin:10px 0;min-height:22px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.42);display:flex;align-items:center;justify-content:center;z-index:40;padding:24px}
+.overlay[hidden]{display:none}
+.overlay .box{background:#fff;border-radius:22px;padding:30px 34px;text-align:center;max-width:340px;width:100%;box-shadow:0 30px 80px rgba(0,0,0,.3)}
+.overlay .box h2{font-size:24px;margin-bottom:8px}
+.overlay .box p{color:var(--ink2);font-size:14px;margin-bottom:20px}
+.hidden{display:none!important}
+
+
+.mem{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;width:min(400px,92vw);margin:0 auto}
+.mem .card{aspect-ratio:1;perspective:600px;cursor:pointer}
+.mem .inner{position:relative;width:100%;height:100%;transition:transform .4s;transform-style:preserve-3d}
+.mem .card.flip .inner{transform:rotateY(180deg)}
+.mem .f,.mem .bk{position:absolute;inset:0;border-radius:12px;display:flex;align-items:center;justify-content:center;
+backface-visibility:hidden;-webkit-backface-visibility:hidden;font-size:clamp(24px,7vw,38px)}
+.mem .f{background:#fff;border:1px solid var(--line);color:var(--accent);transform:rotateY(180deg)}
+.mem .bk{background:linear-gradient(135deg,#c9c9d0,#e8e8ee)}
+.mem .card.done .f{background:#eaf5ee;opacity:.7}
+
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+<a class="back" href="../"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>游戏中心</a>
+<span class="name">记忆翻牌</span><span class="spacer"></span><span class="badge">益智</span>
+</div></header>
+<main class="stage">
+<div class="hud"><div class="cell"><div class="k">步数</div><div class="v" id="moves">0</div></div><div class="cell"><div class="k">配对</div><div class="v" id="pairs">0/8</div></div><div class="cell"><div class="k">最少步</div><div class="v" id="best">—</div></div></div>
+<div class="panel"><div class="mem" id="mem"></div></div>
+<div class="msg" id="msg"></div>
+<div class="controls"><button class="btn" onclick="newGame()">重新洗牌</button></div>
+<p class="tips">翻开两张，图案相同即配对消除。用尽量少的步数翻完全部。</p>
+</main>
+
+<script>
+
+var ICONS=['🍎','🍊','🍋','🍇','🍉','🍒','🥝','🍑'],deck,first=null,lock=false,moves,pairs,best=hiGet('memory');
+function newGame(){deck=ICONS.concat(ICONS).sort(()=>Math.random()-.5);first=null;lock=false;moves=0;pairs=0;
+ document.getElementById('moves').textContent=0;document.getElementById('pairs').textContent='0/8';setMsg('');
+ document.getElementById('best').textContent=best||'—';render()}
+function render(){var m=document.getElementById('mem');m.innerHTML='';deck.forEach(function(ic,i){
+ var card=document.createElement('div');card.className='card'+(cardState[i].flip?' flip':'')+(cardState[i].done?' done':'');
+ card.innerHTML='<div class="inner"><div class="f">'+ic+'</div><div class="bk"></div></div>';
+ card.onclick=function(){flip(i)};m.appendChild(card)})}
+var cardState=[];
+function initState(){cardState=deck.map(()=>({flip:false,done:false}))}
+function flip(i){if(lock||cardState[i].flip||cardState[i].done)return;cardState[i].flip=true;render();
+ if(!first){first=i;return}
+ moves++;document.getElementById('moves').textContent=moves;var f=first;first=null;
+ if(deck[f]===deck[i]){cardState[f].done=cardState[i].done=true;pairs++;
+  document.getElementById('pairs').textContent=pairs+'/8';setMsg('配对成功！');
+  if(pairs===8){if(!best||moves<best){best=moves;hiSet('memory',best);document.getElementById('best').textContent=best}setMsg('全部翻开！用了 '+moves+' 步')}
+ }else{lock=true;setTimeout(function(){cardState[f].flip=cardState[i].flip=false;render();lock=false;setMsg('')},700)}
+ render()}
+// 重写 newGame 以同步状态
+var _ng=newGame;newGame=function(){_ng();initState();render()};newGame();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>太空射击 · 课间游戏中心</title>
+<meta name="theme-color" content="#f5f5f7">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<style>
+:root{--accent:#5e5ce6}
+
+:root{--bg:#f5f5f7;--paper:#fff;--ink:#1d1d1f;--ink2:#6e6e73;--ink3:#9a9a9e;
+--line:rgba(0,0,0,.09);--accent:#0a84ff;--shadow:0 18px 50px -28px rgba(0,0,0,.28);--r:20px}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC","Microsoft YaHei",sans-serif;
+-webkit-font-smoothing:antialiased;min-height:100vh;line-height:1.5}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+.top{position:sticky;top:0;z-index:20;background:rgba(245,245,247,.8);
+backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);
+border-bottom:1px solid var(--line)}
+.top-in{max-width:640px;margin:0 auto;padding:0 18px;height:52px;display:flex;align-items:center;gap:12px}
+.back{display:inline-flex;align-items:center;gap:6px;color:var(--ink2);font-size:14px;transition:color .2s}
+.back:hover{color:var(--ink)}
+.back svg{width:16px;height:16px}
+.top .name{font-weight:650;font-size:16px;letter-spacing:-.2px}
+.top .spacer{flex:1}
+.top .badge{font-size:11px;color:var(--ink3);border:1px solid var(--line);padding:4px 10px;border-radius:999px}
+.stage{max-width:640px;margin:0 auto;padding:22px 18px 60px}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:20px}
+.hud{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:0 0 18px}
+.hud .cell{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:8px 16px;text-align:center;min-width:86px}
+.hud .cell .k{font-size:11px;color:var(--ink3);letter-spacing:.4px}
+.hud .cell .v{font-size:20px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+.controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.btn{border:none;background:var(--ink);color:#fff;padding:11px 20px;border-radius:999px;font-size:14px;font-weight:600;transition:transform .15s,opacity .15s}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:scale(.97)}
+.btn.sec{background:#e8e8ed;color:var(--ink)}
+.tips{margin-top:16px;text-align:center;color:var(--ink3);font-size:12.5px;line-height:1.7}
+.msg{text-align:center;font-size:15px;color:var(--ink2);margin:10px 0;min-height:22px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.42);display:flex;align-items:center;justify-content:center;z-index:40;padding:24px}
+.overlay[hidden]{display:none}
+.overlay .box{background:#fff;border-radius:22px;padding:30px 34px;text-align:center;max-width:340px;width:100%;box-shadow:0 30px 80px rgba(0,0,0,.3)}
+.overlay .box h2{font-size:24px;margin-bottom:8px}
+.overlay .box p{color:var(--ink2);font-size:14px;margin-bottom:20px}
+.hidden{display:none!important}
+
+
+.ss canvas{display:block;margin:0 auto;background:#05060a;border-radius:12px;touch-action:none;max-width:100%}
+
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+<a class="back" href="../"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>游戏中心</a>
+<span class="name">太空射击</span><span class="spacer"></span><span class="badge">动作</span>
+</div></header>
+<main class="stage">
+<div class="hud"><div class="cell"><div class="k">得分</div><div class="v" id="score">0</div></div><div class="cell"><div class="k">生命</div><div class="v" id="life">3</div></div><div class="cell"><div class="k">最高</div><div class="v" id="best">0</div></div></div>
+<div class="panel ss"><canvas id="cv" width="360" height="440"></canvas></div>
+<div class="msg" id="msg"></div>
+<div class="controls"><button class="btn" onclick="start()">开始 / 重来</button><button class="btn sec" onclick="shoot()">开火</button></div>
+<p class="tips">← → 或拖动飞船，点"开火"/空格发射。击落敌机得分，别让它们撞到底部。</p>
+</main>
+<div class="overlay" id="ov" hidden><div class="box"><h2>游戏结束</h2><p id="ovp"></p><button class="btn" onclick="start();document.getElementById('ov').hidden=true">再来一局</button></div></div>
+<script>
+
+var cv=document.getElementById('cv'),ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+var ship,bullets,enemies,score=0,life=3,best=hiGet('shooter'),run=false,timer,tickC=0;
+function start(){ship={x:W/2,y:H-40,w:34};bullets=[];enemies=[];score=0;life=3;tickC=0;run=true;
+ document.getElementById('score').textContent=0;document.getElementById('life').textContent=3;
+ document.getElementById('best').textContent=best;document.getElementById('ov').hidden=true;clearInterval(timer);timer=setInterval(step,20);setMsg('')}
+function shoot(){if(!run)return;bullets.push({x:ship.x,y:ship.y-10,vy:-7})}
+function step(){if(!run)return;tickC++;
+ if(tickC%55===0)enemies.push({x:30+Math.random()*(W-60),y:-20,vy:1.6+Math.random()*1.2,r:14});
+ bullets.forEach(function(b){b.y+=b.vy});bullets=bullets.filter(function(b){return b.y>-10});
+ enemies.forEach(function(e){e.y+=e.vy});
+ for(var i=enemies.length-1;i>=0;i--){var e=enemies[i],hit=false;
+  bullets.forEach(function(b){if(!hit&&Math.abs(b.x-e.x)<e.r&&Math.abs(b.y-e.y)<e.r){hit=true;b.y=-999;score+=10;
+   document.getElementById('score').textContent=score;if(score>best){best=score;hiSet('shooter',best);document.getElementById('best').textContent=best}}});
+  if(hit){enemies.splice(i,1);continue}
+  if(e.y>H+20){enemies.splice(i,1);life--;document.getElementById('life').textContent=life;
+   if(life<=0){run=false;clearInterval(timer);document.getElementById('ovp').textContent='得分 '+score;document.getElementById('ov').hidden=false;return}}}
+ draw()}
+function draw(){ctx.fillStyle='#05060a';ctx.fillRect(0,0,W,H);
+ ctx.fillStyle='rgba(255,255,255,.06)';for(var i=0;i<40;i++)ctx.fillRect(Math.random()*W,Math.random()*H,1,1);
+ ctx.fillStyle='#5e5ce6';ctx.beginPath();ctx.moveTo(ship.x,ship.y-16);ctx.lineTo(ship.x-16,ship.y+12);ctx.lineTo(ship.x+16,ship.y+12);ctx.closePath();ctx.fill();
+ ctx.fillStyle='#ffcc00';bullets.forEach(function(b){ctx.fillRect(b.x-2,b.y-8,4,12)});
+ enemies.forEach(function(e){ctx.fillStyle='#ff3b30';ctx.beginPath();ctx.arc(e.x,e.y,e.r,0,7);ctx.fill();
+  ctx.fillStyle='#fff';ctx.fillRect(e.x-6,e.y-2,12,4)});
+ ctx.fillStyle='#fff';ctx.font='11px sans-serif';ctx.fillText('← → 移动 · 空格开火',10,20)}
+document.addEventListener('keydown',function(e){if(e.key==='ArrowLeft')ship.x=Math.max(18,ship.x-16);
+ if(e.key==='ArrowRight')ship.x=Math.min(W-18,ship.x+16);if(e.key===' ')shoot()});
+cv.addEventListener('mousemove',function(e){var r=cv.getBoundingClientRect();ship.x=(e.clientX-r.left)/r.width*W});
+cv.addEventListener('touchmove',function(e){e.preventDefault();var r=cv.getBoundingClientRect();ship.x=(e.touches[0].clientX-r.left)/r.width*W;shoot()},{passive:false});
+start();
+
+</script>
+</body>
+</html>

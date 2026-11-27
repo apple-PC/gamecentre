@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>连连看 · 课间游戏中心</title>
+<meta name="theme-color" content="#f5f5f7">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<style>
+:root{--accent:#ff2d55}
+
+:root{--bg:#f5f5f7;--paper:#fff;--ink:#1d1d1f;--ink2:#6e6e73;--ink3:#9a9a9e;
+--line:rgba(0,0,0,.09);--accent:#0a84ff;--shadow:0 18px 50px -28px rgba(0,0,0,.28);--r:20px}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC","Microsoft YaHei",sans-serif;
+-webkit-font-smoothing:antialiased;min-height:100vh;line-height:1.5}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+.top{position:sticky;top:0;z-index:20;background:rgba(245,245,247,.8);
+backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);
+border-bottom:1px solid var(--line)}
+.top-in{max-width:640px;margin:0 auto;padding:0 18px;height:52px;display:flex;align-items:center;gap:12px}
+.back{display:inline-flex;align-items:center;gap:6px;color:var(--ink2);font-size:14px;transition:color .2s}
+.back:hover{color:var(--ink)}
+.back svg{width:16px;height:16px}
+.top .name{font-weight:650;font-size:16px;letter-spacing:-.2px}
+.top .spacer{flex:1}
+.top .badge{font-size:11px;color:var(--ink3);border:1px solid var(--line);padding:4px 10px;border-radius:999px}
+.stage{max-width:640px;margin:0 auto;padding:22px 18px 60px}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:20px}
+.hud{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:0 0 18px}
+.hud .cell{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:8px 16px;text-align:center;min-width:86px}
+.hud .cell .k{font-size:11px;color:var(--ink3);letter-spacing:.4px}
+.hud .cell .v{font-size:20px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+.controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.btn{border:none;background:var(--ink);color:#fff;padding:11px 20px;border-radius:999px;font-size:14px;font-weight:600;transition:transform .15s,opacity .15s}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:scale(.97)}
+.btn.sec{background:#e8e8ed;color:var(--ink)}
+.tips{margin-top:16px;text-align:center;color:var(--ink3);font-size:12.5px;line-height:1.7}
+.msg{text-align:center;font-size:15px;color:var(--ink2);margin:10px 0;min-height:22px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.42);display:flex;align-items:center;justify-content:center;z-index:40;padding:24px}
+.overlay[hidden]{display:none}
+.overlay .box{background:#fff;border-radius:22px;padding:30px 34px;text-align:center;max-width:340px;width:100%;box-shadow:0 30px 80px rgba(0,0,0,.3)}
+.overlay .box h2{font-size:24px;margin-bottom:8px}
+.overlay .box p{color:var(--ink2);font-size:14px;margin-bottom:20px}
+.hidden{display:none!important}
+
+
+.lk{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;width:min(380px,94vw);margin:0 auto;background:#fff;padding:8px;border-radius:14px}
+.lk button{aspect-ratio:1;border:1px solid var(--line);border-radius:8px;background:#f9f9fb;font-size:clamp(18px,5vw,26px);transition:all .15s}
+.lk button.sel{background:#ffe0e6;outline:2px solid var(--accent)}
+.lk button.gone{opacity:0;pointer-events:none}
+.lk button.path{background:#d8f0dc}
+
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+<a class="back" href="../"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>游戏中心</a>
+<span class="name">连连看</span><span class="spacer"></span><span class="badge">益智</span>
+</div></header>
+<main class="stage">
+<div class="hud"><div class="cell"><div class="k">剩余</div><div class="v" id="left">0</div></div><div class="cell"><div class="k">时间</div><div class="v" id="time">0</div></div></div>
+<div class="panel"><div class="lk" id="lk"></div></div>
+<div class="msg" id="msg"></div>
+<div class="controls"><button class="btn" onclick="start()">新游戏</button><button class="btn sec" onclick="shuffle()">重新洗牌</button></div>
+<p class="tips">找出两个相同图案，若它们之间能用不超过两次转折的路径连通即可消除。</p>
+</main>
+
+<script>
+
+var R=6,C=6,ICONS=['🍎','🍊','🍋','🍇','🍉','🍒','🥝','🍑','🥑','🍍','🥥','🍓'],bd,sel=null,timer,t=0,left=0;
+function start(){var pairs=R*C/2,arr=[];for(var i=0;i<pairs;i++)arr.push(ICONS[i%ICONS.length],ICONS[i%ICONS.length]);
+ arr.sort(()=>Math.random()-.5);bd=[];for(var i=0;i<R;i++)bd.push(arr.slice(i*C,(i+1)*C));sel=null;left=R*C;t=0;
+ clearInterval(timer);timer=setInterval(function(){t++;document.getElementById('time').textContent=t},1000);render();setMsg('')}
+function render(){var lk=document.getElementById('lk');lk.innerHTML='';
+ for(var i=0;i<R;i++)for(var j=0;j<C;j++){var b=document.createElement('button');b.textContent=bd[i][j]||'';
+  if(bd[i][j]==='')b.className='gone';if(sel&&sel[0]===i&&sel[1]===j)b.className='sel';
+  (function(x,y){b.onclick=function(){click(x,y)}})(i,j);lk.appendChild(b)}
+ document.getElementById('left').textContent=left}
+function click(i,j){if(!bd[i][j])return;if(!sel){sel=[i,j];render();return}
+ if(sel[0]===i&&sel[1]===j){sel=null;render();return}
+ if(bd[sel[0]][sel[1]]===bd[i][j]&&canLink(sel[0],sel[1],i,j)){var a=sel;sel=null;bd[a[0]][a[1]]='';bd[i][j]='';left-=2;render();setMsg('消除！');
+  if(left===0){clearInterval(timer);setMsg('全部消除！用时 '+t+' 秒')}}else{sel=[i,j];render();setMsg('不能连通')}}
+function empty(x,y){return x>=0&&x<R&&y>=0&&y<C&&bd[x][y]===''}
+function lineClear(x1,y1,x2,y2){if(x1===x2){for(var y=Math.min(y1,y2)+1;y<Math.max(y1,y2);y++)if(!empty(x1,y))return false;return true}
+ if(y1===y2){for(var x=Math.min(x1,x2)+1;x<Math.max(x1,x2);x++)if(!empty(x,y1))return false;return true}return false}
+function canLink(x1,y1,x2,y2){if(lineClear(x1,y1,x2,y2))return true;
+ for(var r=0;r<R;r++)for(var c=0;c<C;c++){if(empty(r,c)&&lineClear(x1,y1,r,c)&&lineClear(r,c,x2,y2)&&(x1===r||y1===c||x2===r||y2===c))return true}
+ return false}
+function shuffle(){var a=[];for(var i=0;i<R;i++)for(var j=0;j<C;j++)if(bd[i][j])a.push(bd[i][j]);
+ a.sort(()=>Math.random()-.5);var k=0;for(var i=0;i<R;i++)for(var j=0;j<C;j++)if(bd[i][j])bd[i][j]=a[k++];sel=null;render()}
+start();
+
+</script>
+</body>
+</html>

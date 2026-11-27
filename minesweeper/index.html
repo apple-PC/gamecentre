@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>扫雷 · 课间游戏中心</title>
+<meta name="theme-color" content="#f5f5f7">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<style>
+:root{--accent:#0a84ff}
+
+:root{--bg:#f5f5f7;--paper:#fff;--ink:#1d1d1f;--ink2:#6e6e73;--ink3:#9a9a9e;
+--line:rgba(0,0,0,.09);--accent:#0a84ff;--shadow:0 18px 50px -28px rgba(0,0,0,.28);--r:20px}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC","Microsoft YaHei",sans-serif;
+-webkit-font-smoothing:antialiased;min-height:100vh;line-height:1.5}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+.top{position:sticky;top:0;z-index:20;background:rgba(245,245,247,.8);
+backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);
+border-bottom:1px solid var(--line)}
+.top-in{max-width:640px;margin:0 auto;padding:0 18px;height:52px;display:flex;align-items:center;gap:12px}
+.back{display:inline-flex;align-items:center;gap:6px;color:var(--ink2);font-size:14px;transition:color .2s}
+.back:hover{color:var(--ink)}
+.back svg{width:16px;height:16px}
+.top .name{font-weight:650;font-size:16px;letter-spacing:-.2px}
+.top .spacer{flex:1}
+.top .badge{font-size:11px;color:var(--ink3);border:1px solid var(--line);padding:4px 10px;border-radius:999px}
+.stage{max-width:640px;margin:0 auto;padding:22px 18px 60px}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:20px}
+.hud{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:0 0 18px}
+.hud .cell{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:8px 16px;text-align:center;min-width:86px}
+.hud .cell .k{font-size:11px;color:var(--ink3);letter-spacing:.4px}
+.hud .cell .v{font-size:20px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+.controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.btn{border:none;background:var(--ink);color:#fff;padding:11px 20px;border-radius:999px;font-size:14px;font-weight:600;transition:transform .15s,opacity .15s}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:scale(.97)}
+.btn.sec{background:#e8e8ed;color:var(--ink)}
+.tips{margin-top:16px;text-align:center;color:var(--ink3);font-size:12.5px;line-height:1.7}
+.msg{text-align:center;font-size:15px;color:var(--ink2);margin:10px 0;min-height:22px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.42);display:flex;align-items:center;justify-content:center;z-index:40;padding:24px}
+.overlay[hidden]{display:none}
+.overlay .box{background:#fff;border-radius:22px;padding:30px 34px;text-align:center;max-width:340px;width:100%;box-shadow:0 30px 80px rgba(0,0,0,.3)}
+.overlay .box h2{font-size:24px;margin-bottom:8px}
+.overlay .box p{color:var(--ink2);font-size:14px;margin-bottom:20px}
+.hidden{display:none!important}
+
+
+.mboard{display:grid;gap:2px;background:#d9d9de;padding:5px;border-radius:12px;width:max-content;margin:0 auto;max-width:96vw}
+.mcell{width:30px;height:30px;background:#f0f0f3;border-radius:5px;display:flex;align-items:center;justify-content:center;
+font-weight:700;font-size:15px;user-select:none;transition:background .1s}
+.mcell.open{background:#fff}
+.mcell.flag{background:#ffe0e0}
+.mcell.mine{background:#ffd6d6}
+@media(max-width:400px){.mcell{width:26px;height:26px;font-size:13px}}
+.n1{color:#0a84ff}.n2{color:#34c759}.n3{color:#ff3b30}.n4{color:#5856d6}.n5{color:#ff9500}.n6{color:#30b0c7}.n7{color:#1d1d1f}.n8{color:#8e8e93}
+
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+<a class="back" href="../"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>游戏中心</a>
+<span class="name">扫雷</span><span class="spacer"></span><span class="badge">经典</span>
+</div></header>
+<main class="stage">
+<div class="hud"><div class="cell"><div class="k">剩余雷</div><div class="v" id="left">10</div></div><div class="cell"><div class="k">时间</div><div class="v" id="time">0</div></div></div>
+<div class="panel"><div class="mboard" id="mb"></div></div>
+<div class="msg" id="msg"></div>
+<div class="controls"><button class="btn" onclick="reset()">新游戏</button><button class="btn sec" id="modeBtn" onclick="toggleMode()">右键标旗</button></div>
+<p class="tips">左键翻开，右键标旗（手机长按照标旗）。数字代表周围 8 格的地雷数。</p>
+</main>
+<div class="overlay" id="ov" hidden><div class="box"><h2 id="ovt">踩雷了</h2><p id="ovp"></p><button class="btn" onclick="reset();document.getElementById('ov').hidden=true">再来一局</button></div></div>
+<script>
+
+var R=9,C=9,M=10,g,opened,flags,mark,timer,t=0,over=false,longT=null;
+function reset(){g=Array.from({length:R},()=>Array.from({length:C},()=>({m:0,o:false,f:false,n:0})));
+ opened=0;flags=0;t=0;over=false;mark=false;clearInterval(timer);timer=null;
+ document.getElementById('time').textContent=0;document.getElementById('left').textContent=M;
+ document.getElementById('ov').hidden=true;document.getElementById('modeBtn').textContent='右键标旗';
+ var cells=[];for(var i=0;i<R*C;i++)cells.push(i);cells.sort(()=>Math.random()-.5);
+ for(var k=0;k<M;k++){var idx=cells[k],i=idx/C|0,j=idx%C;g[i][j].m=1}
+ for(var i=0;i<R;i++)for(var j=0;j<C;j++){var n=0;for(var a=-1;a<=1;a++)for(var b=-1;b<=1;b++){
+  var x=i+a,y=j+b;if((a||b)&&x>=0&&x<R&&y>=0&&y<C&&g[x][y].m)n++}g[i][j].n=n}
+ render();setMsg('')}
+function render(){var mb=document.getElementById('mb');mb.innerHTML='';mb.style.gridTemplateColumns='repeat('+C+',30px)';
+ if(window.innerWidth<400)mb.style.gridTemplateColumns='repeat('+C+',26px)';
+ for(var i=0;i<R;i++)for(var j=0;j<C;j++){var c=g[i][j],el=document.createElement('div');el.className='mcell';
+  if(c.o){el.classList.add('open');if(c.m){el.classList.add('mine');el.textContent='💥'}else if(c.n){el.classList.add('n'+c.n);el.textContent=c.n}}
+  else if(c.f){el.classList.add('flag');el.textContent='⚑'}else el.textContent='';
+  (function(ii,jj){el.onclick=function(e){click(ii,jj,e)};el.oncontextmenu=function(e){e.preventDefault();flag(ii,jj)};
+   el.onmousedown=function(e){if(e.button===0)longT=setTimeout(function(){flag(ii,jj);mark=true},450)};
+   el.onmouseup=function(){clearTimeout(longT)};el.onmouseleave=function(){clearTimeout(longT)};
+  })(i,j);mb.appendChild(el)}}
+function startTimer(){if(!timer)timer=setInterval(function(){t++;document.getElementById('time').textContent=t},1000)}
+function click(i,j,e){if(over)return;if(mark){mark=false;return}var c=g[i][j];if(c.f||c.o)return;
+ if(c.m){c.o=true;render();lose();return}open(i,j);startTimer();
+ if(opened===R*C-M){over=true;clearInterval(timer);document.getElementById('ovt').textContent='排雷成功！';
+  document.getElementById('ovp').textContent='用时 '+t+' 秒';document.getElementById('ov').hidden=false}}
+function open(i,j){var st=[[i,j]];while(st.length){var p=st.pop(),x=p[0],y=p[1],c=g[x][y];if(c.o||c.f)continue;c.o=true;opened++;
+ if(c.n===0)for(var a=-1;a<=1;a++)for(var b=-1;b<=1;b++){var nx=x+a,ny=y+b;if((a||b)&&nx>=0&&nx<R&&ny>=0&&ny<C&&!g[nx][ny].o&&!g[nx][ny].m)st.push([nx,ny])}}
+ render()}
+function flag(i,j){if(over)return;var c=g[i][j];if(c.o)return;c.f=!c.f;flags+=c.f?1:-1;document.getElementById('left').textContent=M-flags;render()}
+function lose(){over=true;clearInterval(timer);for(var i=0;i<R;i++)for(var j=0;j<C;j++)if(g[i][j].m)g[i][j].o=true;render();
+ document.getElementById('ovp').textContent='坚持了 '+t+' 秒';document.getElementById('ov').hidden=false}
+function toggleMode(){mark=!mark;document.getElementById('modeBtn').textContent=mark?'点击标旗(开)':'右键标旗'}
+reset();
+
+</script>
+</body>
+</html>

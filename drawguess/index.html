@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>你画我猜 · 课间游戏中心</title>
+<meta name="theme-color" content="#f5f5f7">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<style>
+:root{--accent:#ff2d55}
+
+:root{--bg:#f5f5f7;--paper:#fff;--ink:#1d1d1f;--ink2:#6e6e73;--ink3:#9a9a9e;
+--line:rgba(0,0,0,.09);--accent:#0a84ff;--shadow:0 18px 50px -28px rgba(0,0,0,.28);--r:20px}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC","Microsoft YaHei",sans-serif;
+-webkit-font-smoothing:antialiased;min-height:100vh;line-height:1.5}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+.top{position:sticky;top:0;z-index:20;background:rgba(245,245,247,.8);
+backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);
+border-bottom:1px solid var(--line)}
+.top-in{max-width:640px;margin:0 auto;padding:0 18px;height:52px;display:flex;align-items:center;gap:12px}
+.back{display:inline-flex;align-items:center;gap:6px;color:var(--ink2);font-size:14px;transition:color .2s}
+.back:hover{color:var(--ink)}
+.back svg{width:16px;height:16px}
+.top .name{font-weight:650;font-size:16px;letter-spacing:-.2px}
+.top .spacer{flex:1}
+.top .badge{font-size:11px;color:var(--ink3);border:1px solid var(--line);padding:4px 10px;border-radius:999px}
+.stage{max-width:640px;margin:0 auto;padding:22px 18px 60px}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:20px}
+.hud{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:0 0 18px}
+.hud .cell{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:8px 16px;text-align:center;min-width:86px}
+.hud .cell .k{font-size:11px;color:var(--ink3);letter-spacing:.4px}
+.hud .cell .v{font-size:20px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+.controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.btn{border:none;background:var(--ink);color:#fff;padding:11px 20px;border-radius:999px;font-size:14px;font-weight:600;transition:transform .15s,opacity .15s}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:scale(.97)}
+.btn.sec{background:#e8e8ed;color:var(--ink)}
+.tips{margin-top:16px;text-align:center;color:var(--ink3);font-size:12.5px;line-height:1.7}
+.msg{text-align:center;font-size:15px;color:var(--ink2);margin:10px 0;min-height:22px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.42);display:flex;align-items:center;justify-content:center;z-index:40;padding:24px}
+.overlay[hidden]{display:none}
+.overlay .box{background:#fff;border-radius:22px;padding:30px 34px;text-align:center;max-width:340px;width:100%;box-shadow:0 30px 80px rgba(0,0,0,.3)}
+.overlay .box h2{font-size:24px;margin-bottom:8px}
+.overlay .box p{color:var(--ink2);font-size:14px;margin-bottom:20px}
+.hidden{display:none!important}
+
+
+.tools{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:10px}
+.tools button,.tools input{border:1px solid var(--line);background:#fff;border-radius:10px;padding:7px 12px;font-size:13px}
+.tools .sw{width:34px;height:34px;padding:0;border-radius:50%;cursor:pointer}
+.tools .sw.on{outline:2px solid var(--ink)}
+.dcv{display:block;width:100%;aspect-ratio:4/3;background:#fff;border:1px solid var(--line);border-radius:12px;touch-action:none;cursor:crosshair}
+.word{text-align:center;font-size:22px;font-weight:700;letter-spacing:4px;color:var(--accent);margin:6px 0}
+
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+<a class="back" href="../"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>游戏中心</a>
+<span class="name">你画我猜</span><span class="spacer"></span><span class="badge">对决</span>
+</div></header>
+<main class="stage">
+<div class="hud"><div class="cell"><div class="k">猜对</div><div class="v" id="ok">0</div></div><div class="cell"><div class="k">倒计时</div><div class="v" id="time">60</div></div></div>
+<div class="panel"><div class="word" id="word">点击开始出题</div><div class="tools"><button class="sw on" style="background:#1d1d1f" onclick="setColor('#1d1d1f',this)"></button><button class="sw" style="background:#ff3b30" onclick="setColor('#ff3b30',this)"></button><button class="sw" style="background:#0a84ff" onclick="setColor('#0a84ff',this)"></button><button class="sw" style="background:#34c759" onclick="setColor('#34c759',this)"></button><button onclick="setColor('#ffffff',null)">橡皮</button><input type="range" id="sz" min="2" max="24" value="5" style="width:90px"><button onclick="clearCv()">清空</button></div><canvas id="cv" class="dcv" width="600" height="450"></canvas></div>
+<div class="msg" id="msg"></div>
+<div class="controls"><button class="btn" onclick="next()">换一个词</button><button class="btn sec" onclick="reveal()">公布了</button></div>
+<p class="tips">一人看词作画，其他人猜。猜对点"公布了"计分，60 秒换一个词。</p>
+</main>
+
+<script>
+
+var WORDS=['太阳','雨伞','蛋糕','钢琴','长城','熊猫','火箭','眼镜','自行车','冰淇淋','恐龙','台灯','沙发','关键','风筝','西瓜','雷达','风筝','咖啡','牙刷','狮子','瀑布','彩虹','机器人','闹钟'];
+var cv=document.getElementById('cv'),ctx=cv.getContext('2d'),color='#1d1d1f',drawing=false,ok=0,timer,left=60,cur='';
+ctx.lineCap='round';ctx.lineJoin='round';ctx.fillStyle='#fff';ctx.fillRect(0,0,cv.width,cv.height);
+function pos(e){var r=cv.getBoundingClientRect(),p=e.touches?e.touches[0]:e;return{x:(p.clientX-r.left)/r.width*cv.width,y:(p.clientY-r.top)/r.height*cv.height}}
+function setColor(c,btn){color=c;document.querySelectorAll('.sw').forEach(function(b){b.classList.remove('on')});if(btn)btn.classList.add('on')}
+function startStroke(e){e.preventDefault();drawing=true;var p=pos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.strokeStyle=color;ctx.lineWidth=+document.getElementById('sz').value}
+function moveStroke(e){if(!drawing)return;e.preventDefault();var p=pos(e);ctx.lineTo(p.x,p.y);ctx.stroke()}
+function endStroke(){drawing=false}
+cv.addEventListener('mousedown',startStroke);cv.addEventListener('mousemove',moveStroke);window.addEventListener('mouseup',endStroke);
+cv.addEventListener('touchstart',startStroke,{passive:false});cv.addEventListener('touchmove',moveStroke,{passive:false});window.addEventListener('touchend',endStroke);
+function clearCv(){ctx.fillStyle='#fff';ctx.fillRect(0,0,cv.width,cv.height)}
+function next(){cur=WORDS[Math.random()*WORDS.length|0];document.getElementById('word').textContent=cur;clearCv();
+ left=60;document.getElementById('time').textContent=60;clearInterval(timer);timer=setInterval(function(){left--;document.getElementById('time').textContent=left;
+  if(left<=0){clearInterval(timer);setMsg('时间到！下一个词')}},1000);setMsg('')}
+function reveal(){ok++;document.getElementById('ok').textContent=ok;setMsg('猜对了！');
+ document.getElementById('word').style.color='#34c759';setTimeout(function(){document.getElementById('word').style.color='';next()},700)}
+next();
+
+</script>
+</body>
+</html>

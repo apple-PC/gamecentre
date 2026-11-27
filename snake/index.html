@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>贪吃蛇 · 课间游戏中心</title>
+<meta name="theme-color" content="#f5f5f7">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<style>
+:root{--accent:#34c759}
+
+:root{--bg:#f5f5f7;--paper:#fff;--ink:#1d1d1f;--ink2:#6e6e73;--ink3:#9a9a9e;
+--line:rgba(0,0,0,.09);--accent:#0a84ff;--shadow:0 18px 50px -28px rgba(0,0,0,.28);--r:20px}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC","Microsoft YaHei",sans-serif;
+-webkit-font-smoothing:antialiased;min-height:100vh;line-height:1.5}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+.top{position:sticky;top:0;z-index:20;background:rgba(245,245,247,.8);
+backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);
+border-bottom:1px solid var(--line)}
+.top-in{max-width:640px;margin:0 auto;padding:0 18px;height:52px;display:flex;align-items:center;gap:12px}
+.back{display:inline-flex;align-items:center;gap:6px;color:var(--ink2);font-size:14px;transition:color .2s}
+.back:hover{color:var(--ink)}
+.back svg{width:16px;height:16px}
+.top .name{font-weight:650;font-size:16px;letter-spacing:-.2px}
+.top .spacer{flex:1}
+.top .badge{font-size:11px;color:var(--ink3);border:1px solid var(--line);padding:4px 10px;border-radius:999px}
+.stage{max-width:640px;margin:0 auto;padding:22px 18px 60px}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:20px}
+.hud{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:0 0 18px}
+.hud .cell{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:8px 16px;text-align:center;min-width:86px}
+.hud .cell .k{font-size:11px;color:var(--ink3);letter-spacing:.4px}
+.hud .cell .v{font-size:20px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+.controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.btn{border:none;background:var(--ink);color:#fff;padding:11px 20px;border-radius:999px;font-size:14px;font-weight:600;transition:transform .15s,opacity .15s}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:scale(.97)}
+.btn.sec{background:#e8e8ed;color:var(--ink)}
+.tips{margin-top:16px;text-align:center;color:var(--ink3);font-size:12.5px;line-height:1.7}
+.msg{text-align:center;font-size:15px;color:var(--ink2);margin:10px 0;min-height:22px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.42);display:flex;align-items:center;justify-content:center;z-index:40;padding:24px}
+.overlay[hidden]{display:none}
+.overlay .box{background:#fff;border-radius:22px;padding:30px 34px;text-align:center;max-width:340px;width:100%;box-shadow:0 30px 80px rgba(0,0,0,.3)}
+.overlay .box h2{font-size:24px;margin-bottom:8px}
+.overlay .box p{color:var(--ink2);font-size:14px;margin-bottom:20px}
+.hidden{display:none!important}
+
+
+canvas{display:block;margin:0 auto;background:#f0f0f3;border-radius:14px;touch-action:none;max-width:100%}
+.dpad{display:none;grid-template-columns:repeat(3,56px);grid-template-rows:repeat(2,56px);gap:6px;justify-content:center;margin-top:16px}
+.dpad button{border:none;border-radius:12px;background:#e8e8ed;color:var(--ink);font-size:20px;font-weight:700}
+.dpad .u{grid-column:2}.dpad .l{grid-column:1;grid-row:2}.dpad .d{grid-column:2;grid-row:2}.dpad .r{grid-column:3;grid-row:2}
+@media(max-width:520px){.dpad{display:grid}}
+
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+<a class="back" href="../"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>游戏中心</a>
+<span class="name">贪吃蛇</span><span class="spacer"></span><span class="badge">经典</span>
+</div></header>
+<main class="stage">
+<div class="hud"><div class="cell"><div class="k">得分</div><div class="v" id="score">0</div></div><div class="cell"><div class="k">最高</div><div class="v" id="best">0</div></div></div>
+<div class="panel"><canvas id="cv" width="360" height="360"></canvas><div class="dpad"><button class="u" onclick="turn(0,-1)">↑</button><button class="l" onclick="turn(-1,0)">←</button><button class="d" onclick="turn(0,1)">↓</button><button class="r" onclick="turn(1,0)">→</button></div></div>
+<div class="msg" id="msg"></div>
+<div class="controls"><button class="btn" onclick="start()">开始 / 重来</button><button class="btn sec" onclick="togglePause()" id="pbtn">暂停</button></div>
+<p class="tips">方向键或 WASD 控制，手机用下方方向盘。别撞墙、别咬到自己。</p>
+</main>
+<div class="overlay" id="ov" hidden><div class="box"><h2>撞到了！</h2><p id="ovp"></p><button class="btn" onclick="start();document.getElementById('ov').hidden=true">再来一局</button></div></div>
+<script>
+
+var cv=document.getElementById('cv'),ctx=cv.getContext('2d'),N=18,cell=cv.width/N;
+var snake,dir,food,score=0,best=hiGet('snake'),timer,run=false,pause=false;
+function start(){snake=[[7,9],[6,9],[5,9]];dir=[1,0];score=0;placeFood();run=true;pause=false;
+ document.getElementById('score').textContent=0;document.getElementById('ov').hidden=true;
+ document.getElementById('pbtn').textContent='暂停';clearInterval(timer);timer=setInterval(step,110);setMsg('')}
+function placeFood(){do{food=[Math.random()*N|0,Math.random()*N|0]}while(snake.some(function(s){return s[0]===food[0]&&s[1]===food[1]}))}
+function turn(x,y){if(x===-dir[0]&&y===-dir[1])return;dir=[x,y]}
+function step(){if(!run||pause)return;var h=[snake[0][0]+dir[0],snake[0][1]+dir[1]];
+ if(h[0]<0||h[0]>=N||h[1]<0||h[1]>=N||snake.some(function(s,i){return i<snake.length-1&&s[0]===h[0]&&s[1]===h[1]})){
+  run=false;clearInterval(timer);document.getElementById('ovp').textContent='得分 '+score;document.getElementById('ov').hidden=false;return}
+ snake.unshift(h);if(h[0]===food[0]&&h[1]===food[1]){score++;document.getElementById('score').textContent=score;
+  if(score>best){best=score;hiSet('snake',best);document.getElementById('best').textContent=best}placeFood()}else snake.pop();draw()}
+function draw(){ctx.clearRect(0,0,cv.width,cv.height);
+ ctx.fillStyle='#ff5f57';ctx.beginPath();ctx.arc(food[0]*cell+cell/2,food[1]*cell+cell/2,cell*.36,0,7);ctx.fill();
+ snake.forEach(function(s,i){ctx.fillStyle=i===0?'#1d1d1f':'#34c759';var r=i===0?6:5;
+ ctx.beginPath();ctx.roundRect(s[0]*cell+2,s[1]*cell+2,cell-4,cell-4,r);ctx.fill()})}
+function togglePause(){if(!run)return;pause=!pause;document.getElementById('pbtn').textContent=pause?'继续':'暂停';setMsg(pause?'已暂停':'')}
+var KM={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1],a:[-1,0],d:[1,0],w:[0,-1],s:[0,1],A:[-1,0],D:[1,0],W:[0,-1],S:[0,1]};
+document.addEventListener('keydown',function(e){if(KM[e.key]){e.preventDefault();turn(KM[e.key][0],KM[e.key][1])}});
+var sx=0,sy=0;cv.addEventListener('touchstart',function(e){sx=e.touches[0].clientX;sy=e.touches[0].clientY},{passive:true});
+cv.addEventListener('touchend',function(e){var dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;
+ if(Math.abs(dx)>Math.abs(dy))turn(dx>0?1:-1,0);else turn(0,dy>0?1:-1)},{passive:true});
+document.getElementById('best').textContent=best;start();
+
+</script>
+</body>
+</html>

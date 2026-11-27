@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>俄罗斯方块 · 课间游戏中心</title>
+<meta name="theme-color" content="#f5f5f7">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<style>
+:root{--accent:#5e5ce6}
+
+:root{--bg:#f5f5f7;--paper:#fff;--ink:#1d1d1f;--ink2:#6e6e73;--ink3:#9a9a9e;
+--line:rgba(0,0,0,.09);--accent:#0a84ff;--shadow:0 18px 50px -28px rgba(0,0,0,.28);--r:20px}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);
+font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC","Microsoft YaHei",sans-serif;
+-webkit-font-smoothing:antialiased;min-height:100vh;line-height:1.5}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+.top{position:sticky;top:0;z-index:20;background:rgba(245,245,247,.8);
+backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);
+border-bottom:1px solid var(--line)}
+.top-in{max-width:640px;margin:0 auto;padding:0 18px;height:52px;display:flex;align-items:center;gap:12px}
+.back{display:inline-flex;align-items:center;gap:6px;color:var(--ink2);font-size:14px;transition:color .2s}
+.back:hover{color:var(--ink)}
+.back svg{width:16px;height:16px}
+.top .name{font-weight:650;font-size:16px;letter-spacing:-.2px}
+.top .spacer{flex:1}
+.top .badge{font-size:11px;color:var(--ink3);border:1px solid var(--line);padding:4px 10px;border-radius:999px}
+.stage{max-width:640px;margin:0 auto;padding:22px 18px 60px}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:20px}
+.hud{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:0 0 18px}
+.hud .cell{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:8px 16px;text-align:center;min-width:86px}
+.hud .cell .k{font-size:11px;color:var(--ink3);letter-spacing:.4px}
+.hud .cell .v{font-size:20px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+.controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.btn{border:none;background:var(--ink);color:#fff;padding:11px 20px;border-radius:999px;font-size:14px;font-weight:600;transition:transform .15s,opacity .15s}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:scale(.97)}
+.btn.sec{background:#e8e8ed;color:var(--ink)}
+.tips{margin-top:16px;text-align:center;color:var(--ink3);font-size:12.5px;line-height:1.7}
+.msg{text-align:center;font-size:15px;color:var(--ink2);margin:10px 0;min-height:22px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.42);display:flex;align-items:center;justify-content:center;z-index:40;padding:24px}
+.overlay[hidden]{display:none}
+.overlay .box{background:#fff;border-radius:22px;padding:30px 34px;text-align:center;max-width:340px;width:100%;box-shadow:0 30px 80px rgba(0,0,0,.3)}
+.overlay .box h2{font-size:24px;margin-bottom:8px}
+.overlay .box p{color:var(--ink2);font-size:14px;margin-bottom:20px}
+.hidden{display:none!important}
+
+
+.tet{display:flex;gap:16px;justify-content:center;align-items:flex-start;flex-wrap:wrap}
+.tet canvas{background:#111;border-radius:12px;display:block}
+.next{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
+.next .t{font-size:11px;color:var(--ink3);margin-bottom:6px}
+.next canvas{background:#f5f5f7;border-radius:8px}
+.dpad{display:none;grid-template-columns:repeat(4,48px);gap:5px;justify-content:center;margin-top:14px}
+.dpad button{height:46px;border:none;border-radius:10px;background:#e8e8ed;color:var(--ink);font-size:16px;font-weight:700}
+@media(max-width:520px){.dpad{display:grid}}
+
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+<a class="back" href="../"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>游戏中心</a>
+<span class="name">俄罗斯方块</span><span class="spacer"></span><span class="badge">经典</span>
+</div></header>
+<main class="stage">
+<div class="hud"><div class="cell"><div class="k">得分</div><div class="v" id="score">0</div></div><div class="cell"><div class="k">消行</div><div class="v" id="lines">0</div></div><div class="cell"><div class="k">最高</div><div class="v" id="best">0</div></div></div>
+<div class="panel"><div class="tet"><canvas id="cv" width="240" height="400"></canvas><div class="next"><div class="t">下一个</div><canvas id="nx" width="100" height="100"></canvas></div></div><div class="dpad"><button onclick="mv(-1)">←</button><button onclick="rot()">↻</button><button onclick="mv(1)">→</button><button onclick="drop()">↓</button></div></div>
+<div class="msg" id="msg"></div>
+<div class="controls"><button class="btn" onclick="start()">开始 / 重来</button><button class="btn sec" onclick="pause()" id="pbtn">暂停</button></div>
+<p class="tips">← → 移动，↑ 旋转，↓ 加速，空格直接落下。手机用下方按钮。</p>
+</main>
+<div class="overlay" id="ov" hidden><div class="box"><h2>游戏结束</h2><p id="ovp"></p><button class="btn" onclick="start();document.getElementById('ov').hidden=true">再来一局</button></div></div>
+<script>
+
+var COLS=10,ROWS=20,SZ=20,cv=document.getElementById('cv'),ctx=cv.getContext('2d'),nx=document.getElementById('nx'),nxc=nx.getContext('2d');
+var SHAPES=[[[1,1,1,1]],[[1,1],[1,1]],[[0,1,0],[1,1,1]],[[1,0,0],[1,1,1]],[[0,1,1],[1,1,0]],[[1,1,0],[0,1,1]],[[1,0,1],[1,1,1]]];
+var COLORS=['#00d0ff','#ffd60a','#bf5af2','#ff9f0a','#30d158','#ff375f','#0a84ff'];
+var grid,piece,nextP,score=0,lines=0,best=hiGet('tetris'),timer,pauseF=false,run=false;
+function rand(){return Math.floor(Math.random()*SHAPES.length)}
+function start(){grid=Array.from({length:ROWS},()=>Array(COLS).fill(0));score=0;lines=0;piece=newP();nextP=rand();
+ run=true;pauseF=false;document.getElementById('score').textContent=0;document.getElementById('lines').textContent=0;
+ document.getElementById('best').textContent=best;document.getElementById('ov').hidden=true;document.getElementById('pbtn').textContent='暂停';
+ clearInterval(timer);timer=setInterval(step,500);setMsg('');draw();drawNext()}
+function newP(){return {t:rand(),x:3,y:0,shape:null}}
+function shapeOf(t){return SHAPES[t]}
+function place(t,x,y,sh){var s=shapeOf(t);for(var i=0;i<s.length;i++)for(var j=0;j<s[i].length;j++)if(s[i][j])ctx.fillRect((x+j)*SZ,(y+i)*SZ,SZ,SZ)}
+function collide(t,x,y){var s=shapeOf(t);for(var i=0;i<s.length;i++)for(var j=0;j<s[i].length;j++)if(s[i][j]){
+  var X=x+j,Y=y+i;if(X<0||X>=COLS||Y>=ROWS||(Y>=0&&grid[Y][X]))return true}return false}
+function step(){if(!run||pauseF)return;if(!collide(piece.t,piece.x,piece.y+1))piece.y++;else lock()}
+function lock(){var s=shapeOf(piece.t),col=COLORS[piece.t];
+ for(var i=0;i<s.length;i++)for(var j=0;j<s[i].length;j++)if(s[i][j]){var Y=piece.y+i;if(Y<0)return gameOver();grid[Y][piece.x+j]=col}
+ var clear=0;for(var y=ROWS-1;y>=0;y--){if(grid[y].every(function(c){return c})){grid.splice(y,1);grid.unshift(Array(COLS).fill(0));clear++;y++}}
+ if(clear){lines+=clear;score+=[0,100,300,500,800][clear]*1;document.getElementById('score').textContent=score;
+  document.getElementById('lines').textContent=lines;setMsg('消除 '+clear+' 行！')}
+ piece={t:nextP,x:3,y:0};nextP=rand();drawNext();
+ if(collide(piece.t,piece.x,piece.y))gameOver();else draw()}
+function gameOver(){run=false;clearInterval(timer);if(score>best){best=score;hiSet('tetris',best);document.getElementById('best').textContent=best}
+ document.getElementById('ovp').textContent='得分 '+score+' · 消行 '+lines;document.getElementById('ov').hidden=false}
+function draw(){ctx.fillStyle='#111';ctx.fillRect(0,0,cv.width,cv.height);
+ ctx.strokeStyle='rgba(255,255,255,.04)';for(var x=0;x<=COLS;x++){ctx.beginPath();ctx.moveTo(x*SZ,0);ctx.lineTo(x*SZ,ROWS*SZ);ctx.stroke()}
+ for(var y=0;y<ROWS;y++)for(var x=0;x<COLS;x++)if(grid[y][x]){ctx.fillStyle=grid[y][x];ctx.fillRect(x*SZ,y*SZ,SZ,SZ);ctx.strokeStyle='rgba(0,0,0,.25)';ctx.strokeRect(x*SZ,y*SZ,SZ,SZ)}
+ ctx.fillStyle=COLORS[piece.t];place(piece.t,piece.x,piece.y,null)}
+function drawNext(){nxc.fillStyle='#f5f5f7';nxc.fillRect(0,0,nx.width,nx.height);nxc.fillStyle=COLORS[nextP];
+ var s=shapeOf(nextP),ox=(10-s[0].length*20)/2,oy=(10-s.length*20)/2;
+ for(var i=0;i<s.length;i++)for(var j=0;j<s[i].length;j++)if(s[i][j])nxc.fillRect(ox+j*20,oy+i*20,20,20)}
+function mv(d){if(run&&!pauseF&&!collide(piece.t,piece.x+d,piece.y)){piece.x+=d;draw()}}
+function rot(){if(!run||pauseF)return;var t=piece.t,cur=shapeOf(t),r=cur[0].map((_,i)=>cur.map(row=>row[i]).reverse());
+ SHAPES[t]=r;if(collide(t,piece.x,piece.y))SHAPES[t]=cur;draw()}
+function softDrop(){if(run&&!pauseF){step();draw()}}
+function drop(){if(!run||pauseF)return;while(!collide(piece.t,piece.x,piece.y+1))piece.y++;lock()}
+function pause(){if(!run)return;pauseF=!pauseF;document.getElementById('pbtn').textContent=pauseF?'继续':'暂停';setMsg(pauseF?'已暂停':'')}
+document.addEventListener('keydown',function(e){if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown',' '].includes(e.key))e.preventDefault();
+ if(e.key==='ArrowLeft')mv(-1);if(e.key==='ArrowRight')mv(1);if(e.key==='ArrowUp')rot();if(e.key==='ArrowDown')softDrop();if(e.key===' ')drop()});
+start();
+
+</script>
+</body>
+</html>

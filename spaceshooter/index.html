@@ -4,161 +4,198 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>太空射击 · PlayStation web</title>
-<meta name="theme-color" content="#0a0e1a">
-<meta name="description" content="太空射击 — PlayStation web 游戏库，打开即玩，成绩自动保存在本机。">
+<meta name="theme-color" content="#060608">
+<meta name="description" content="太空射击 — PlayStation web 独立游戏页，打开即玩，成绩自动保存在本机。">
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <style>
 :root{--accent:#5e5ce6}
 
 :root{
-  --bg:#08080a;--paper:rgba(24,25,30,.72);--ink:#f6f7fa;--ink2:rgba(255,255,255,.62);--ink3:rgba(255,255,255,.38);
+  --bg:#08080a;--paper:rgba(24,25,30,.72);--ink:#f6f7fa;--ink2:rgba(255,255,255,.64);--ink3:rgba(255,255,255,.4);
   --line:rgba(255,255,255,.11);--accent:#0070d1;--accent-hi:#4da3ff;
   --shadow:0 26px 60px -26px rgba(0,0,0,.85), inset 0 1px 0 rgba(255,255,255,.06);
-  --r:12px;--ease:cubic-bezier(.25,.1,.25,1)
+  --r:12px;--ease:cubic-bezier(.25,.1,.25,1);--ease2:cubic-bezier(.22,.61,.36,1)
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%}
 body{
-  background:radial-gradient(880px 520px at 78% -10%,rgba(0,112,209,.16),transparent 62%),
-    radial-gradient(700px 420px at 8% 104%,rgba(0,80,160,.10),transparent 66%),
-    linear-gradient(180deg,#0b0c10 0%,#08080a 58%,#060607 100%);
-  background-attachment:fixed;color:var(--ink);
+  background:#08080a;color:var(--ink);
   font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC","Microsoft YaHei",sans-serif;
-  -webkit-font-smoothing:antialiased;min-height:100vh;line-height:1.5;overflow-x:hidden
+  -webkit-font-smoothing:antialiased;min-height:100vh;line-height:1.5;overflow-x:hidden;
+  opacity:0;transition:opacity 560ms var(--ease)
 }
+body.ready{opacity:1}
 a{color:inherit;text-decoration:none}
-button{font-family:inherit;cursor:pointer;color:inherit}
+button{font-family:inherit;cursor:pointer;color:inherit;background:none;border:none}
 :focus-visible{outline:2px solid var(--accent-hi);outline-offset:3px;border-radius:10px}
 ::selection{background:rgba(0,112,193,.55);color:#fff}
-/* 系统状态栏 */
-.sysbar{height:30px;padding:0 26px;display:flex;align-items:center;gap:11px;font-size:10.5px;
- letter-spacing:.9px;color:var(--ink2);background:rgba(6,6,8,.72);border-bottom:1px solid rgba(255,255,255,.07)}
-.sysbar .ps{display:flex;align-items:center;gap:7px;font-weight:700;color:#e8f0ff}
-.sysbar .ps svg{width:16px;height:16px}
-.sysbar .sp{flex:1}
-.sysbar .clock{font-variant-numeric:tabular-nums;color:#dbe6ff;letter-spacing:.5px}
-.sysbar .me{display:flex;align-items:center;gap:6px;color:#e8f0ff}
-.sysbar .me .dot{width:7px;height:7px;border-radius:50%;background:#4da3ff;box-shadow:0 0 9px #4da3ff}
-.sysbar .ava{width:19px;height:19px;border-radius:50%;background:linear-gradient(135deg,#1684de,#004b94);display:grid;place-items:center;font-size:9px;font-weight:700}
-.sysbar .ic{width:13px;height:13px;opacity:.8}
-/* 顶栏 */
-.top{position:sticky;top:0;z-index:30;height:62px;display:flex;align-items:center;gap:10px;padding:0 24px;
- background:rgba(10,10,13,.78);backdrop-filter:blur(30px) saturate(140%);-webkit-backdrop-filter:blur(30px) saturate(140%);
- border-bottom:1px solid rgba(255,255,255,.07)}
-.top::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent)}
-.top .home{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;color:var(--ink2);background:rgba(255,255,255,.05);transition:all 220ms var(--ease)}
-.top .home:hover{color:#fff;background:rgba(0,112,193,.24)}
-.top .home svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round}
-.back{display:inline-flex;align-items:center;gap:6px;color:var(--ink2);font-size:12.5px;
- border:1px solid rgba(160,190,255,.16);border-radius:999px;padding:6px 13px;background:rgba(255,255,255,.035);
- transition:all 220ms var(--ease)}
-.back:hover{color:#fff;border-color:rgba(255,255,255,.4);background:rgba(255,255,255,.08)}
-.back svg{width:15px;height:15px}
-.top .name{font-weight:600;font-size:15px;letter-spacing:.2px}
-.top .spacer{flex:1}
-.top .badge{font-size:10.5px;color:#bcd6ff;border:1px solid rgba(0,112,193,.4);background:rgba(0,112,193,.14);padding:4px 11px;border-radius:999px}
-.top .psbtn{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;
- background:linear-gradient(135deg,#1684de,#004b94);color:#fff;box-shadow:0 0 20px rgba(0,112,193,.5)}
-.top .psbtn svg{width:17px;height:17px;fill:#fff}
-/* 舞台与玻璃面板 */
-.stage{max-width:680px;margin:0 auto;padding:26px 18px 110px}
-.panel{background:linear-gradient(160deg,rgba(27,28,34,.72),rgba(13,13,16,.8));border:1px solid rgba(255,255,255,.08);
- border-radius:12px;box-shadow:0 24px 64px -26px rgba(0,0,0,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:20px}
+
+/* ============ 全屏壁纸 ============ */
+.gwall{position:fixed;inset:0;z-index:0;overflow:hidden;background:#07070a}
+.gwall svg{position:absolute;inset:0;width:100%;height:100%;
+ filter:blur(2px) brightness(.72) saturate(1.05);transform:scale(1.04);
+ animation:wallIn 1400ms var(--ease2) both}
+@keyframes wallIn{from{opacity:0;transform:scale(1.1)}to{opacity:1;transform:scale(1.04)}}
+.gwall:after{content:"";position:absolute;inset:0;
+ background:
+  linear-gradient(180deg,rgba(6,6,9,.62) 0%,rgba(6,6,9,.30) 30%,rgba(6,6,9,.72) 72%,rgba(6,6,9,.96) 100%),
+  radial-gradient(120% 80% at 50% 0%,transparent 30%,rgba(5,5,8,.55) 100%)}
+
+/* ============ 顶栏 ============ */
+.gtop{position:sticky;top:0;z-index:40;height:58px;display:flex;align-items:center;gap:12px;padding:0 26px;
+ background:linear-gradient(180deg,rgba(6,6,9,.86),rgba(6,6,9,.42) 70%,transparent);
+ backdrop-filter:blur(22px) saturate(1.2);-webkit-backdrop-filter:blur(22px) saturate(1.2)}
+.gback{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:rgba(255,255,255,.72);
+ background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);transition:.22s var(--ease)}
+.gback:hover{background:rgba(255,255,255,.14);color:#fff}
+.gback svg{width:17px;height:17px}
+.gname{font-size:12.5px;font-weight:600;letter-spacing:.01em;color:rgba(255,255,255,.82)}
+.gname i{font-style:normal;color:rgba(255,255,255,.36);font-weight:400;margin-left:9px;font-size:11px}
+.spacer{flex:1}
+.guser{display:flex;align-items:center;gap:8px;padding:3px 11px 3px 3px;border-radius:999px;
+ background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);font-size:11.5px;color:rgba(255,255,255,.7)}
+.guser .av{width:26px;height:26px;border-radius:50%;overflow:hidden;display:block}
+.guser .av svg{width:100%;height:100%;display:block}
+.gps{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:#fff;
+ background:linear-gradient(140deg,#1b8ae8,#04509b);box-shadow:0 0 18px rgba(0,112,209,.45);
+ transition:transform .22s var(--ease),filter .22s var(--ease)}
+.gps:hover{transform:translateY(-1px);filter:brightness(1.1)}
+.gps span{font-size:10px;font-weight:800;letter-spacing:.02em;line-height:1}
+
+/* ============ 游戏信息区 ============ */
+main.stage{position:relative;z-index:1}
+.stage{max-width:720px;margin:0 auto;padding:10px 18px 64px}
+.gstage{display:flex;flex-direction:column;justify-content:center;min-height:calc(100vh - 56px - 210px)}
+.ghero{position:relative;z-index:1;display:flex;gap:20px;align-items:center;
+ max-width:760px;margin:0 auto;padding:8px 18px 18px}
+.ghero-cover{position:relative;width:244px;flex:0 0 auto;aspect-ratio:16/9;border-radius:8px;overflow:hidden;
+ outline:1px solid rgba(255,255,255,.14);box-shadow:0 20px 44px rgba(0,0,0,.62);
+ transition:transform 300ms var(--ease2),outline-color 300ms var(--ease2)}
+.ghero-cover:hover{transform:translateY(-3px) scale(1.02);outline-color:rgba(255,255,255,.42)}
+.gcover-in{position:absolute;inset:0;display:block}
+.gcover-in svg{width:100%;height:100%;display:block}
+.gcover-play{position:absolute;right:9px;bottom:9px;width:30px;height:30px;border-radius:50%;
+ background:rgba(6,6,9,.55);backdrop-filter:blur(8px);display:grid;place-items:center;color:#fff;opacity:.9}
+.gcover-play svg{width:14px;height:14px}
+.ghero-txt{min-width:0}
+.ghero-cat{font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.42);font-weight:600}
+.ghero-txt h1{font-size:clamp(24px,3vw,32px);font-weight:600;letter-spacing:-.03em;margin-top:6px;line-height:1.1}
+.ghero-txt p{font-size:13px;color:rgba(255,255,255,.55);margin-top:7px;letter-spacing:0}
+.ghero-meta{display:flex;gap:18px;margin-top:12px;font-size:11px;color:rgba(255,255,255,.44);flex-wrap:wrap}
+.ghero-meta b{color:rgba(255,255,255,.88);font-weight:600}
+
+/* 面板与游戏控件（各游戏共用） */
+.stage canvas{max-width:100%;height:auto}
+.panel{background:linear-gradient(160deg,rgba(26,27,33,.76),rgba(12,12,15,.84));border:1px solid rgba(255,255,255,.08);
+ border-radius:12px;box-shadow:0 24px 64px -26px rgba(0,0,0,.92);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);padding:20px}
 .hud{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:0 0 18px}
-.hud .cell{background:rgba(14,20,38,.64);border:1px solid var(--line);border-radius:14px;padding:8px 16px;text-align:center;min-width:86px;backdrop-filter:blur(12px)}
+.hud .cell{background:rgba(20,21,26,.72);border:1px solid var(--line);border-radius:12px;padding:7px 16px;
+ text-align:center;min-width:84px;backdrop-filter:blur(14px)}
 .hud .cell .k{font-size:11px;color:var(--ink3);letter-spacing:.6px}
-.hud .cell .v{font-size:20px;font-weight:650;margin-top:2px;font-variant-numeric:tabular-nums;color:#fff;text-shadow:0 0 18px rgba(255,255,255,.16)}
+.hud .cell .v{font-size:19px;font-weight:650;margin-top:1px;font-variant-numeric:tabular-nums;color:#fff}
 .controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:20px}
-.btn{border:1px solid rgba(255,255,255,.2);border-radius:999px;background:linear-gradient(180deg,#1684de,#0064b4);color:#fff;
- padding:11px 22px;font-size:14px;font-weight:600;box-shadow:0 8px 22px -8px rgba(0,112,193,.85),inset 0 1px 0 rgba(255,255,255,.22);
+.btn{border:1px solid rgba(255,255,255,.2);border-radius:999px;background:linear-gradient(180deg,#1b8ae8,#0064b4);color:#fff;
+ padding:10px 22px;font-size:13.5px;font-weight:600;box-shadow:0 8px 22px -8px rgba(0,112,193,.85),inset 0 1px 0 rgba(255,255,255,.22);
  transition:transform 220ms var(--ease),box-shadow 220ms var(--ease),filter 220ms var(--ease)}
 .btn:hover{transform:translateY(-1px);filter:brightness(1.08)}
 .btn:active{transform:scale(.97)}
-.btn.sec{background:rgba(255,255,255,.075);color:#e6edff;border-color:rgba(160,190,255,.2);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+.btn.sec{background:rgba(255,255,255,.075);color:#e6edff;border-color:rgba(255,255,255,.16);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
 .btn.sec:hover{background:rgba(255,255,255,.13);box-shadow:none}
 .tips{margin-top:18px;text-align:center;color:var(--ink3);font-size:12.5px;line-height:1.75}
-.msg{text-align:center;font-size:14px;color:#bcd6ff;margin:10px 0;min-height:22px}
-.overlay{position:fixed;inset:0;background:rgba(3,5,12,.76);backdrop-filter:blur(12px);
+.msg{text-align:center;font-size:13.5px;color:#cfe3ff;margin:10px 0;min-height:21px}
+.overlay{position:fixed;inset:0;background:rgba(3,4,9,.78);backdrop-filter:blur(14px);
  display:flex;align-items:center;justify-content:center;z-index:60;padding:24px}
 .overlay[hidden]{display:none}
-.overlay .box{background:linear-gradient(155deg,rgba(28,29,35,.96),rgba(12,13,17,.97));border:1px solid rgba(255,255,255,.13);
- border-radius:22px;padding:32px 34px;text-align:center;max-width:340px;width:100%;box-shadow:0 30px 90px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.08)}
-.overlay .box h2{font-size:24px;font-weight:650;margin-bottom:8px}
-.overlay .box p{color:var(--ink2);font-size:14px;margin-bottom:22px}
+.overlay .box{background:linear-gradient(155deg,rgba(30,31,37,.97),rgba(12,12,16,.98));border:1px solid rgba(255,255,255,.13);
+ border-radius:18px;padding:30px 32px;text-align:center;max-width:340px;width:100%;
+ box-shadow:0 30px 90px rgba(0,0,0,.78),inset 0 1px 0 rgba(255,255,255,.07)}
+.overlay .box h2{font-size:23px;font-weight:650;margin-bottom:8px;letter-spacing:-.02em}
+.overlay .box p{color:var(--ink2);font-size:13.5px;margin-bottom:20px}
 .hidden{display:none!important}
-/* PS5 手柄按键提示条 */
-.hints{position:fixed;left:0;right:0;bottom:30px;z-index:35;height:54px;display:flex;align-items:center;justify-content:center;gap:30px;
- background:linear-gradient(180deg,transparent,rgba(4,7,16,.92) 42%);font-size:11.5px;color:var(--ink2)}
-.hint{display:flex;align-items:center;gap:7px}
-.hint svg{width:17px;height:17px}
-.hint .x{stroke:#2f9bff}.hint .o{stroke:#e8455d}.hint .t{stroke:#37c98b}.hint .s{stroke:#c878dd}
-/* 控制中心 */
-.cc{position:fixed;inset:0;z-index:70;background:rgba(3,5,12,.6);backdrop-filter:blur(16px);
- display:none;align-items:flex-end;justify-content:center;padding:0 0 64px}
-.cc.on{display:flex}
-.cc-box{width:min(560px,94vw);background:linear-gradient(160deg,rgba(26,36,64,.96),rgba(11,16,31,.97));
- border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:22px;box-shadow:0 30px 80px rgba(0,0,0,.8)}
-.cc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-.cc-head b{font-size:14px}.cc-head span{font-size:11px;color:var(--ink3)}
-.cc-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.cc-act{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center;font-size:12px;transition:all 220ms var(--ease)}
-.cc-act:hover{border-color:var(--hi);background:rgba(0,112,193,.15)}
+
+/* ============ 底部按键提示 ============ */
+.hints{position:fixed;left:0;right:0;bottom:0;z-index:36;height:50px;display:flex;align-items:center;justify-content:center;gap:28px;
+ background:linear-gradient(180deg,transparent,rgba(4,4,7,.92) 46%);font-size:11px;color:rgba(255,255,255,.46);
+ pointer-events:none}
+.hint{display:flex;align-items:center;gap:6px}
+.hint svg{width:15px;height:15px}
+.hint .x{stroke:#3ba0ff}.hint .o{stroke:#e8455d}.hint .t{stroke:#37c98b}.hint .s{stroke:#c878dd}
+
+/* ============ PS 菜单（Esc） ============ */
+.psm{position:fixed;inset:0;z-index:80;display:flex;align-items:flex-end;justify-content:center;padding:0 0 66px;
+ background:rgba(3,3,6,.58);backdrop-filter:blur(22px) saturate(1.1);-webkit-backdrop-filter:blur(22px);
+ opacity:0;pointer-events:none;transition:opacity 260ms var(--ease)}
+.psm.on{opacity:1;pointer-events:auto}
+.psm-panel{width:min(760px,93vw);background:linear-gradient(165deg,rgba(30,32,40,.97),rgba(11,12,16,.98));
+ border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:20px 22px;
+ box-shadow:0 34px 96px rgba(0,0,0,.84);transform:translateY(22px) scale(.99);transition:transform 320ms var(--ease2)}
+.psm.on .psm-panel{transform:none}
+.psm-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.psm-head b{font-size:11px;font-weight:600;letter-spacing:.18em;color:rgba(255,255,255,.5);text-transform:uppercase}
+.psm-head span{font-size:10.5px;color:rgba(255,255,255,.32)}
+.psm-user{display:flex;align-items:center;gap:11px;padding:11px 13px;border-radius:11px;margin-bottom:14px;
+ background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.07)}
+.psm-user .av{width:34px;height:34px;border-radius:50%;overflow:hidden;flex:0 0 auto}
+.psm-user .av svg{width:100%;height:100%;display:block}
+.psm-user div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.psm-user b{font-size:13px;font-weight:600}
+.psm-user i{font-size:11px;font-style:normal;color:rgba(255,255,255,.42);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.psm-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.psm-card{text-align:left;padding:13px 14px;border-radius:10px;background:rgba(255,255,255,.055);
+ border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:4px;transition:.2s var(--ease)}
+.psm-card:hover,.psm-card:focus-visible{background:rgba(255,255,255,.13);border-color:rgba(255,255,255,.26);transform:translateY(-1px)}
+.psm-card b{font-size:12.5px;font-weight:600}
+.psm-card i{font-size:10px;font-style:normal;color:rgba(255,255,255,.38)}
+.psm-card.danger b{color:#ff8b8b}
+.psm-quick{display:flex;gap:4px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.07)}
+.psm-q{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px 4px;border-radius:8px;
+ font-size:9.5px;color:rgba(255,255,255,.42);transition:.2s var(--ease)}
+.psm-q:hover{background:rgba(255,255,255,.08);color:#fff}
+.psm-q svg{width:17px;height:17px;stroke-width:1.7;fill:none;stroke:currentColor}
+
 ::-webkit-scrollbar{width:9px;height:9px}
 ::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:rgba(100,135,200,.3);border-radius:9px}
-@media(max-width:520px){.sysbar{padding:0 14px}.sysbar .net{display:none}.stage{padding-top:18px}.hints{gap:12px}.hint span{display:none}}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.16);border-radius:9px}
+@media(max-width:820px){
+  .gtop{padding:0 16px;height:54px}
+  .psm-cards{grid-template-columns:repeat(2,1fr)}
+  .hint span{display:none}.hints{gap:18px}
+  .ghero{flex-direction:column;align-items:stretch;gap:13px;padding:6px 16px 18px}
+  .ghero-cover{width:76%;align-self:flex-start}
+  .ghero-txt p{display:none}
+  .stage{padding-top:8px}
+}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
-
-
-/* 爱发电：底部说明条 */
-.afd-bar{position:fixed;left:0;right:0;bottom:0;z-index:46;height:30px;display:flex;align-items:center;justify-content:center;
- gap:6px;padding:0 14px;background:rgba(6,10,20,.97);border-top:1px solid rgba(255,138,61,.22);
- font-size:11px;color:#c3cee4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;
- transition:color 220ms var(--ease),border-color 220ms var(--ease)}
-.afd-bar:hover{color:#ffd0ab;border-color:rgba(255,138,61,.5)}
-.afd-bar b{color:#ff9d57;font-weight:600}
-.afd-bar .afd-heart{color:#ff7a3d;font-size:12px;line-height:1}
-.afd-bar .afd-arrow{color:#ff9d57;font-size:11px;opacity:.8}
-@media(max-width:520px){.afd-bar{font-size:10px;gap:5px}.afd-bar .afd-arrow{display:none}}
-/* 爱发电：首次弹窗 */
-.afd-modal{position:fixed;inset:0;z-index:92;background:rgba(3,5,12,.64);backdrop-filter:blur(10px);
- display:none;align-items:center;justify-content:center;padding:20px}
-.afd-modal.on{display:flex;animation:afdIn 260ms var(--ease)}
-@keyframes afdIn{from{opacity:0}to{opacity:1}}
-.afd-card{width:min(400px,92vw);background:linear-gradient(160deg,#2b1709,#150b05 72%);
- border:1px solid rgba(255,138,61,.34);border-radius:22px;padding:26px 24px 20px;position:relative;
- box-shadow:0 30px 90px rgba(0,0,0,.78);text-align:center;animation:afdUp 300ms var(--ease)}
-@keyframes afdUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-.afd-badge{display:inline-block;font-size:11px;letter-spacing:.04em;color:#ffb27a;
- border:1px solid rgba(255,138,61,.4);background:rgba(255,138,61,.12);padding:4px 12px;border-radius:999px;margin-bottom:14px}
-.afd-card h3{font-size:19px;font-weight:650;color:#fff4ec;margin-bottom:10px}
-.afd-card p{font-size:13px;line-height:1.7;color:#c9b3a4;margin-bottom:20px}
-.afd-go{display:block;background:linear-gradient(135deg,#ff9a4d,#ff6a1a);color:#241004;font-weight:650;
- font-size:13.5px;padding:12px;border-radius:12px;transition:transform 220ms var(--ease),filter 220ms var(--ease)}
-.afd-go:hover{transform:translateY(-1px);filter:brightness(1.06)}
-.afd-later{display:inline-block;background:none;border:none;color:#8b7a6e;font-size:12px;margin-top:12px;
- cursor:pointer;font-family:inherit;padding:4px 8px}
-.afd-later:hover{color:#c9b3a4}
-.afd-close{position:absolute;top:10px;right:13px;background:none;border:none;color:#9c8878;font-size:22px;
- line-height:1;cursor:pointer;padding:2px 4px}
-.afd-close:hover{color:#ffb27a}
 
 
 .ss canvas{display:block;margin:0 auto;background:#05060a;border-radius:12px;touch-action:none;max-width:100%}
 
 </style>
 </head>
-<body>
-<div class="sysbar"><span class="ps"><svg viewBox="0 0 24 24"><path d="M6 3c6-1 10 1 10 5 0 3-2 4-5 5l5 8h-4l-4-7H9v7H6V3z" fill="currentColor"/></svg>PLAYSTATION WEB</span>
-<span class="sp"></span><svg class="ic net" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8.5a15 15 0 0120 0M5 12a10 10 0 0114 0M8.5 15.5a5 5 0 017 0"/><circle cx="12" cy="19" r="1" fill="currentColor"/></svg>
-<span class="clock" id="sysclock">--:--</span><span class="me"><i class="dot"></i><span class="ava">Z</span>梓涵</span></div>
-<header class="top">
-<a class="home" href="../" title="主页"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1v-9z"/></svg></a>
-<a class="back" href="../"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>游戏库</a>
-<span class="name">太空射击</span><span class="spacer"></span><span class="badge">动作</span>
-<button class="psbtn" id="psbtn" title="控制中心"><svg viewBox="0 0 24 24"><path d="M6 3c6-1 10 1 10 5 0 3-2 4-5 5l5 8h-4l-4-7H9v7H6V3z"/></svg></button>
+<body class="gpage">
+<div class="gwall"><svg class="wp-art" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><circle cx="593" cy="1008" r="3.0" fill="#fff" opacity="0.48"/><circle cx="335" cy="250" r="1.0" fill="#fff" opacity="0.52"/><circle cx="887" cy="687" r="1.4" fill="#fff" opacity="0.27"/><circle cx="690" cy="32" r="2.8" fill="#fff" opacity="0.74"/><circle cx="915" cy="593" r="2.5" fill="#fff" opacity="0.27"/><circle cx="167" cy="593" r="1.7" fill="#fff" opacity="0.55"/><circle cx="1196" cy="730" r="1.6" fill="#fff" opacity="0.43"/><circle cx="935" cy="7" r="2.1" fill="#fff" opacity="0.47"/><circle cx="1184" cy="72" r="2.6" fill="#fff" opacity="0.47"/><circle cx="1811" cy="478" r="2.6" fill="#fff" opacity="0.71"/><circle cx="1687" cy="866" r="2.1" fill="#fff" opacity="0.75"/><circle cx="1069" cy="364" r="2.5" fill="#fff" opacity="0.20"/><circle cx="605" cy="232" r="2.1" fill="#fff" opacity="0.77"/><circle cx="1736" cy="536" r="2.7" fill="#fff" opacity="0.28"/><circle cx="373" cy="458" r="1.0" fill="#fff" opacity="0.58"/><circle cx="1759" cy="1067" r="2.3" fill="#fff" opacity="0.58"/><circle cx="489" cy="276" r="1.1" fill="#fff" opacity="0.65"/><circle cx="1685" cy="1036" r="2.9" fill="#fff" opacity="0.49"/><circle cx="1233" cy="794" r="3.0" fill="#fff" opacity="0.62"/><circle cx="693" cy="225" r="1.5" fill="#fff" opacity="0.41"/><circle cx="1261" cy="170" r="2.9" fill="#fff" opacity="0.43"/><circle cx="583" cy="87" r="2.5" fill="#fff" opacity="0.39"/><circle cx="1398" cy="697" r="2.1" fill="#fff" opacity="0.36"/><circle cx="231" cy="636" r="2.6" fill="#fff" opacity="0.36"/><circle cx="514" cy="402" r="1.0" fill="#fff" opacity="0.44"/><circle cx="1759" cy="284" r="2.2" fill="#fff" opacity="0.46"/><circle cx="1857" cy="689" r="0.9" fill="#fff" opacity="0.77"/><circle cx="300" cy="71" r="2.6" fill="#fff" opacity="0.26"/><circle cx="453" cy="462" r="2.7" fill="#fff" opacity="0.61"/><circle cx="692" cy="407" r="1.9" fill="#fff" opacity="0.79"/><circle cx="18" cy="15" r="2.3" fill="#fff" opacity="0.35"/><circle cx="977" cy="920" r="2.1" fill="#fff" opacity="0.67"/><circle cx="739" cy="744" r="2.1" fill="#fff" opacity="0.74"/><circle cx="1083" cy="290" r="1.2" fill="#fff" opacity="0.27"/><circle cx="1656" cy="225" r="0.9" fill="#fff" opacity="0.46"/><circle cx="1800" cy="662" r="2.8" fill="#fff" opacity="0.72"/><circle cx="661" cy="1066" r="1.7" fill="#fff" opacity="0.28"/><circle cx="11" cy="558" r="1.7" fill="#fff" opacity="0.25"/><circle cx="1765" cy="324" r="1.0" fill="#fff" opacity="0.32"/><circle cx="411" cy="1072" r="2.5" fill="#fff" opacity="0.41"/><circle cx="1217" cy="323" r="1.3" fill="#fff" opacity="0.66"/><circle cx="741" cy="521" r="2.9" fill="#fff" opacity="0.57"/><circle cx="220" cy="1074" r="2.6" fill="#fff" opacity="0.59"/><circle cx="1901" cy="1023" r="0.9" fill="#fff" opacity="0.52"/><circle cx="847" cy="863" r="1.4" fill="#fff" opacity="0.47"/><circle cx="631" cy="939" r="1.0" fill="#fff" opacity="0.68"/><circle cx="1099" cy="211" r="1.0" fill="#fff" opacity="0.22"/><circle cx="441" cy="24" r="3.2" fill="#fff" opacity="0.37"/><circle cx="1300" cy="864" r="2.1" fill="#fff" opacity="0.80"/><circle cx="270" cy="384" r="1.4" fill="#fff" opacity="0.68"/><circle cx="1361" cy="906" r="2.3" fill="#fff" opacity="0.65"/><circle cx="322" cy="938" r="1.4" fill="#fff" opacity="0.56"/><circle cx="1053" cy="362" r="2.2" fill="#fff" opacity="0.20"/><circle cx="498" cy="555" r="2.4" fill="#fff" opacity="0.68"/><circle cx="1507" cy="975" r="2.1" fill="#fff" opacity="0.69"/><circle cx="1151" cy="123" r="2.0" fill="#fff" opacity="0.33"/><circle cx="340" cy="5" r="1.8" fill="#fff" opacity="0.20"/><circle cx="1428" cy="612" r="1.1" fill="#fff" opacity="0.52"/><circle cx="1070" cy="617" r="1.3" fill="#fff" opacity="0.56"/><circle cx="851" cy="580" r="1.7" fill="#fff" opacity="0.37"/><circle cx="1339" cy="22" r="1.4" fill="#fff" opacity="0.65"/><circle cx="1047" cy="82" r="2.8" fill="#fff" opacity="0.26"/><circle cx="878" cy="39" r="0.9" fill="#fff" opacity="0.75"/><circle cx="552" cy="423" r="3.0" fill="#fff" opacity="0.69"/><circle cx="320" cy="152" r="2.8" fill="#fff" opacity="0.31"/><circle cx="1436" cy="567" r="2.3" fill="#fff" opacity="0.37"/><circle cx="939" cy="129" r="3.1" fill="#fff" opacity="0.68"/><circle cx="565" cy="252" r="1.1" fill="#fff" opacity="0.44"/><circle cx="1353" cy="21" r="1.3" fill="#fff" opacity="0.36"/><circle cx="151" cy="801" r="3.2" fill="#fff" opacity="0.40"/><circle cx="586" cy="89" r="2.3" fill="#fff" opacity="0.52"/><circle cx="1451" cy="504" r="2.1" fill="#fff" opacity="0.70"/><circle cx="251" cy="352" r="2.9" fill="#fff" opacity="0.76"/><circle cx="195" cy="288" r="1.6" fill="#fff" opacity="0.76"/><circle cx="1742" cy="876" r="1.9" fill="#fff" opacity="0.79"/><circle cx="357" cy="749" r="2.9" fill="#fff" opacity="0.50"/><circle cx="114" cy="700" r="1.1" fill="#fff" opacity="0.66"/><circle cx="50" cy="747" r="1.1" fill="#fff" opacity="0.19"/><circle cx="333" cy="382" r="2.1" fill="#fff" opacity="0.30"/><circle cx="521" cy="597" r="0.9" fill="#fff" opacity="0.27"/><circle cx="386" cy="194" r="1.0" fill="#fff" opacity="0.49"/><circle cx="39" cy="168" r="2.6" fill="#fff" opacity="0.29"/><circle cx="914" cy="69" r="2.2" fill="#fff" opacity="0.75"/><circle cx="1085" cy="800" r="2.6" fill="#fff" opacity="0.39"/><circle cx="510" cy="835" r="1.6" fill="#fff" opacity="0.32"/><circle cx="1421" cy="655" r="2.6" fill="#fff" opacity="0.67"/><circle cx="289" cy="931" r="1.6" fill="#fff" opacity="0.64"/><circle cx="578" cy="1031" r="2.1" fill="#fff" opacity="0.75"/><circle cx="1613" cy="490" r="2.9" fill="#fff" opacity="0.40"/><circle cx="1862" cy="66" r="1.6" fill="#fff" opacity="0.79"/><circle cx="1889" cy="971" r="1.7" fill="#fff" opacity="0.37"/><circle cx="1490" cy="307" r="2.1" fill="#fff" opacity="0.52"/><circle cx="588" cy="844" r="1.7" fill="#fff" opacity="0.54"/><circle cx="849" cy="183" r="1.8" fill="#fff" opacity="0.42"/><circle cx="1809" cy="725" r="2.7" fill="#fff" opacity="0.22"/><circle cx="716" cy="325" r="1.3" fill="#fff" opacity="0.68"/><circle cx="1875" cy="206" r="2.0" fill="#fff" opacity="0.25"/><circle cx="1547" cy="915" r="1.3" fill="#fff" opacity="0.23"/><circle cx="149" cy="1047" r="2.9" fill="#fff" opacity="0.19"/><circle cx="1504" cy="118" r="1.5" fill="#fff" opacity="0.62"/><circle cx="1260" cy="903" r="2.2" fill="#fff" opacity="0.52"/><circle cx="52" cy="477" r="1.1" fill="#fff" opacity="0.40"/><circle cx="144" cy="244" r="1.3" fill="#fff" opacity="0.53"/><circle cx="76" cy="871" r="1.3" fill="#fff" opacity="0.51"/><circle cx="1919" cy="304" r="1.6" fill="#fff" opacity="0.39"/><circle cx="705" cy="29" r="1.2" fill="#fff" opacity="0.53"/><circle cx="1391" cy="426" r="2.7" fill="#fff" opacity="0.37"/><circle cx="1556" cy="833" r="1.1" fill="#fff" opacity="0.34"/><circle cx="333" cy="79" r="0.9" fill="#fff" opacity="0.49"/><circle cx="231" cy="103" r="2.9" fill="#fff" opacity="0.43"/><circle cx="1684" cy="235" r="2.6" fill="#fff" opacity="0.27"/><circle cx="469" cy="514" r="1.5" fill="#fff" opacity="0.19"/><circle cx="1251" cy="872" r="1.4" fill="#fff" opacity="0.72"/><circle cx="684" cy="184" r="1.6" fill="#fff" opacity="0.49"/><circle cx="1740" cy="888" r="1.6" fill="#fff" opacity="0.34"/><circle cx="1050" cy="463" r="2.4" fill="#fff" opacity="0.36"/><circle cx="909" cy="154" r="2.0" fill="#fff" opacity="0.24"/><circle cx="762" cy="946" r="1.7" fill="#fff" opacity="0.73"/><circle cx="143" cy="809" r="2.0" fill="#fff" opacity="0.69"/><circle cx="828" cy="87" r="3.1" fill="#fff" opacity="0.20"/><circle cx="33" cy="62" r="1.5" fill="#fff" opacity="0.67"/><circle cx="1005" cy="358" r="1.1" fill="#fff" opacity="0.70"/><circle cx="295" cy="981" r="3.0" fill="#fff" opacity="0.68"/><circle cx="70" cy="516" r="1.3" fill="#fff" opacity="0.32"/><circle cx="1760" cy="762" r="1.8" fill="#fff" opacity="0.77"/><circle cx="8" cy="603" r="2.6" fill="#fff" opacity="0.75"/><circle cx="318" cy="684" r="2.5" fill="#fff" opacity="0.74"/><circle cx="423" cy="1033" r="2.5" fill="#fff" opacity="0.60"/><circle cx="1234" cy="352" r="1.1" fill="#fff" opacity="0.42"/><circle cx="899" cy="225" r="1.9" fill="#fff" opacity="0.66"/><circle cx="960" cy="560" r="760" fill="0,132,229" opacity="0.035"/><circle cx="960" cy="560" r="520" fill="0,132,229" opacity="0.045"/><circle cx="960" cy="560" r="320" fill="0,132,229" opacity="0.06"/><rect x="863" y="640" width="11" height="34" rx="5" fill="#fff" opacity="0.72"/><rect x="863" y="640" width="11" height="34" rx="5" fill="0,132,229" opacity="0.50"/><rect x="863" y="552" width="11" height="34" rx="5" fill="#fff" opacity="0.62"/><rect x="863" y="552" width="11" height="34" rx="5" fill="0,132,229" opacity="0.43"/><rect x="863" y="464" width="11" height="34" rx="5" fill="#fff" opacity="0.52"/><rect x="863" y="464" width="11" height="34" rx="5" fill="0,132,229" opacity="0.36"/><rect x="863" y="376" width="11" height="34" rx="5" fill="#fff" opacity="0.42"/><rect x="863" y="376" width="11" height="34" rx="5" fill="0,132,229" opacity="0.29"/><rect x="863" y="288" width="11" height="34" rx="5" fill="#fff" opacity="0.32"/><rect x="863" y="288" width="11" height="34" rx="5" fill="0,132,229" opacity="0.22"/><rect x="863" y="200" width="11" height="34" rx="5" fill="#fff" opacity="0.22"/><rect x="863" y="200" width="11" height="34" rx="5" fill="0,132,229" opacity="0.15"/><rect x="1047" y="640" width="11" height="34" rx="5" fill="#fff" opacity="0.72"/><rect x="1047" y="640" width="11" height="34" rx="5" fill="0,132,229" opacity="0.50"/><rect x="1047" y="552" width="11" height="34" rx="5" fill="#fff" opacity="0.62"/><rect x="1047" y="552" width="11" height="34" rx="5" fill="0,132,229" opacity="0.43"/><rect x="1047" y="464" width="11" height="34" rx="5" fill="#fff" opacity="0.52"/><rect x="1047" y="464" width="11" height="34" rx="5" fill="0,132,229" opacity="0.36"/><rect x="1047" y="376" width="11" height="34" rx="5" fill="#fff" opacity="0.42"/><rect x="1047" y="376" width="11" height="34" rx="5" fill="0,132,229" opacity="0.29"/><rect x="1047" y="288" width="11" height="34" rx="5" fill="#fff" opacity="0.32"/><rect x="1047" y="288" width="11" height="34" rx="5" fill="0,132,229" opacity="0.22"/><rect x="1047" y="200" width="11" height="34" rx="5" fill="#fff" opacity="0.22"/><rect x="1047" y="200" width="11" height="34" rx="5" fill="0,132,229" opacity="0.15"/><rect x="954" y="330" width="12" height="230" rx="6" fill="#fff" opacity=".55"/><rect x="954" y="330" width="12" height="230" rx="6" fill="0,132,229" opacity=".45"/><circle cx="1470" cy="268" r="230" fill="0,132,229" opacity="0.05"/><circle cx="1470" cy="268" r="170" fill="0,132,229" opacity="0.09"/><circle cx="1470" cy="268" r="118" fill="0,132,229" opacity="0.16"/><circle cx="1470" cy="268" r="72" fill="0,132,229" opacity="0.26"/><circle cx="1470" cy="268" r="40" fill="0,132,229" opacity="0.4"/><circle cx="1470" cy="268" r="17" fill="#fff" opacity=".92"/><path d="M1514 268L1582 268" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".45"/><path d="M1492 306L1526 365" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".45"/><path d="M1448 306L1414 365" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".45"/><path d="M1426 268L1358 268" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".45"/><path d="M1448 230L1414 171" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".45"/><path d="M1492 230L1526 171" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".45"/><g transform="translate(960 800) scale(1.85)"><path d="M0 -150L96 60L22 22L0 96L-22 22L-96 60Z" fill="rgba(0,132,229,0.98)"/><path d="M0 -150L0 96" stroke="#fff" stroke-width="3" opacity=".28"/><circle cx="0" cy="-28" r="15" fill="#fff" opacity=".9"/></g><rect x="954" y="960" width="13" height="210" rx="6" fill="0,132,229" opacity="0.50"/><rect x="954" y="970" width="13" height="178" rx="6" fill="0,132,229" opacity="0.42"/><rect x="954" y="980" width="13" height="146" rx="6" fill="0,132,229" opacity="0.34"/><rect x="954" y="990" width="13" height="114" rx="6" fill="0,132,229" opacity="0.26"/><rect x="954" y="1000" width="13" height="82" rx="6" fill="0,132,229" opacity="0.18"/></svg></div>
+<header class="gtop">
+  <a class="gback" href="../" title="返回主页"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></a>
+  <span class="gname">太空射击<i>射击</i></span>
+  <span class="spacer"></span>
+  <span class="guser"><span class="av" id="gAvatar"></span><span id="gUser">访客</span></span>
+  <button class="gps" id="psbtn" title="控制中心（Esc）"><span>PS</span></button>
 </header>
-<main class="stage">
+<section class="ghero">
+  <a class="ghero-cover" href="../" title="返回主页"><span class="gcover-in"><svg class="ka-art" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><circle cx="593" cy="1008" r="3.0" fill="#fff" opacity="0.48"/><circle cx="335" cy="250" r="1.0" fill="#fff" opacity="0.52"/><circle cx="887" cy="687" r="1.4" fill="#fff" opacity="0.27"/><circle cx="690" cy="32" r="2.8" fill="#fff" opacity="0.74"/><circle cx="915" cy="593" r="2.5" fill="#fff" opacity="0.27"/><circle cx="167" cy="593" r="1.7" fill="#fff" opacity="0.55"/><circle cx="1196" cy="730" r="1.6" fill="#fff" opacity="0.43"/><circle cx="935" cy="7" r="2.1" fill="#fff" opacity="0.47"/><circle cx="1184" cy="72" r="2.6" fill="#fff" opacity="0.47"/><circle cx="1811" cy="478" r="2.6" fill="#fff" opacity="0.71"/><circle cx="1687" cy="866" r="2.1" fill="#fff" opacity="0.75"/><circle cx="1069" cy="364" r="2.5" fill="#fff" opacity="0.20"/><circle cx="605" cy="232" r="2.1" fill="#fff" opacity="0.77"/><circle cx="1736" cy="536" r="2.7" fill="#fff" opacity="0.28"/><circle cx="373" cy="458" r="1.0" fill="#fff" opacity="0.58"/><circle cx="1759" cy="1067" r="2.3" fill="#fff" opacity="0.58"/><circle cx="489" cy="276" r="1.1" fill="#fff" opacity="0.65"/><circle cx="1685" cy="1036" r="2.9" fill="#fff" opacity="0.49"/><circle cx="1233" cy="794" r="3.0" fill="#fff" opacity="0.62"/><circle cx="693" cy="225" r="1.5" fill="#fff" opacity="0.41"/><circle cx="1261" cy="170" r="2.9" fill="#fff" opacity="0.43"/><circle cx="583" cy="87" r="2.5" fill="#fff" opacity="0.39"/><circle cx="1398" cy="697" r="2.1" fill="#fff" opacity="0.36"/><circle cx="231" cy="636" r="2.6" fill="#fff" opacity="0.36"/><circle cx="514" cy="402" r="1.0" fill="#fff" opacity="0.44"/><circle cx="1759" cy="284" r="2.2" fill="#fff" opacity="0.46"/><circle cx="1857" cy="689" r="0.9" fill="#fff" opacity="0.77"/><circle cx="300" cy="71" r="2.6" fill="#fff" opacity="0.26"/><circle cx="453" cy="462" r="2.7" fill="#fff" opacity="0.61"/><circle cx="692" cy="407" r="1.9" fill="#fff" opacity="0.79"/><circle cx="18" cy="15" r="2.3" fill="#fff" opacity="0.35"/><circle cx="977" cy="920" r="2.1" fill="#fff" opacity="0.67"/><circle cx="739" cy="744" r="2.1" fill="#fff" opacity="0.74"/><circle cx="1083" cy="290" r="1.2" fill="#fff" opacity="0.27"/><circle cx="1656" cy="225" r="0.9" fill="#fff" opacity="0.46"/><circle cx="1800" cy="662" r="2.8" fill="#fff" opacity="0.72"/><circle cx="661" cy="1066" r="1.7" fill="#fff" opacity="0.28"/><circle cx="11" cy="558" r="1.7" fill="#fff" opacity="0.25"/><circle cx="1765" cy="324" r="1.0" fill="#fff" opacity="0.32"/><circle cx="411" cy="1072" r="2.5" fill="#fff" opacity="0.41"/><circle cx="1217" cy="323" r="1.3" fill="#fff" opacity="0.66"/><circle cx="741" cy="521" r="2.9" fill="#fff" opacity="0.57"/><circle cx="220" cy="1074" r="2.6" fill="#fff" opacity="0.59"/><circle cx="1901" cy="1023" r="0.9" fill="#fff" opacity="0.52"/><circle cx="847" cy="863" r="1.4" fill="#fff" opacity="0.47"/><circle cx="631" cy="939" r="1.0" fill="#fff" opacity="0.68"/><circle cx="1099" cy="211" r="1.0" fill="#fff" opacity="0.22"/><circle cx="441" cy="24" r="3.2" fill="#fff" opacity="0.37"/><circle cx="1300" cy="864" r="2.1" fill="#fff" opacity="0.80"/><circle cx="270" cy="384" r="1.4" fill="#fff" opacity="0.68"/><circle cx="1361" cy="906" r="2.3" fill="#fff" opacity="0.65"/><circle cx="322" cy="938" r="1.4" fill="#fff" opacity="0.56"/><circle cx="1053" cy="362" r="2.2" fill="#fff" opacity="0.20"/><circle cx="498" cy="555" r="2.4" fill="#fff" opacity="0.68"/><circle cx="1507" cy="975" r="2.1" fill="#fff" opacity="0.69"/><circle cx="1151" cy="123" r="2.0" fill="#fff" opacity="0.33"/><circle cx="340" cy="5" r="1.8" fill="#fff" opacity="0.20"/><circle cx="1428" cy="612" r="1.1" fill="#fff" opacity="0.52"/><circle cx="1070" cy="617" r="1.3" fill="#fff" opacity="0.56"/><circle cx="851" cy="580" r="1.7" fill="#fff" opacity="0.37"/><circle cx="1339" cy="22" r="1.4" fill="#fff" opacity="0.65"/><circle cx="1047" cy="82" r="2.8" fill="#fff" opacity="0.26"/><circle cx="878" cy="39" r="0.9" fill="#fff" opacity="0.75"/><circle cx="552" cy="423" r="3.0" fill="#fff" opacity="0.69"/><circle cx="320" cy="152" r="2.8" fill="#fff" opacity="0.31"/><circle cx="1436" cy="567" r="2.3" fill="#fff" opacity="0.37"/><circle cx="939" cy="129" r="3.1" fill="#fff" opacity="0.68"/><circle cx="565" cy="252" r="1.1" fill="#fff" opacity="0.44"/><circle cx="1353" cy="21" r="1.3" fill="#fff" opacity="0.36"/><circle cx="151" cy="801" r="3.2" fill="#fff" opacity="0.40"/><circle cx="586" cy="89" r="2.3" fill="#fff" opacity="0.52"/><circle cx="1451" cy="504" r="2.1" fill="#fff" opacity="0.70"/><circle cx="251" cy="352" r="2.9" fill="#fff" opacity="0.76"/><circle cx="195" cy="288" r="1.6" fill="#fff" opacity="0.76"/><circle cx="1742" cy="876" r="1.9" fill="#fff" opacity="0.79"/><circle cx="357" cy="749" r="2.9" fill="#fff" opacity="0.50"/><circle cx="114" cy="700" r="1.1" fill="#fff" opacity="0.66"/><circle cx="50" cy="747" r="1.1" fill="#fff" opacity="0.19"/><circle cx="333" cy="382" r="2.1" fill="#fff" opacity="0.30"/><circle cx="521" cy="597" r="0.9" fill="#fff" opacity="0.27"/><circle cx="386" cy="194" r="1.0" fill="#fff" opacity="0.49"/><circle cx="39" cy="168" r="2.6" fill="#fff" opacity="0.29"/><circle cx="914" cy="69" r="2.2" fill="#fff" opacity="0.75"/><circle cx="1085" cy="800" r="2.6" fill="#fff" opacity="0.39"/><circle cx="510" cy="835" r="1.6" fill="#fff" opacity="0.32"/><circle cx="1421" cy="655" r="2.6" fill="#fff" opacity="0.67"/><circle cx="289" cy="931" r="1.6" fill="#fff" opacity="0.64"/><circle cx="578" cy="1031" r="2.1" fill="#fff" opacity="0.75"/><circle cx="1613" cy="490" r="2.9" fill="#fff" opacity="0.40"/><circle cx="1862" cy="66" r="1.6" fill="#fff" opacity="0.79"/><circle cx="1889" cy="971" r="1.7" fill="#fff" opacity="0.37"/><circle cx="1490" cy="307" r="2.1" fill="#fff" opacity="0.52"/><circle cx="588" cy="844" r="1.7" fill="#fff" opacity="0.54"/><circle cx="849" cy="183" r="1.8" fill="#fff" opacity="0.42"/><circle cx="1809" cy="725" r="2.7" fill="#fff" opacity="0.22"/><circle cx="716" cy="325" r="1.3" fill="#fff" opacity="0.68"/><circle cx="1875" cy="206" r="2.0" fill="#fff" opacity="0.25"/><circle cx="1547" cy="915" r="1.3" fill="#fff" opacity="0.23"/><circle cx="149" cy="1047" r="2.9" fill="#fff" opacity="0.19"/><circle cx="1504" cy="118" r="1.5" fill="#fff" opacity="0.62"/><circle cx="1260" cy="903" r="2.2" fill="#fff" opacity="0.52"/><circle cx="52" cy="477" r="1.1" fill="#fff" opacity="0.40"/><circle cx="144" cy="244" r="1.3" fill="#fff" opacity="0.53"/><circle cx="76" cy="871" r="1.3" fill="#fff" opacity="0.51"/><circle cx="1919" cy="304" r="1.6" fill="#fff" opacity="0.39"/><circle cx="705" cy="29" r="1.2" fill="#fff" opacity="0.53"/><circle cx="1391" cy="426" r="2.7" fill="#fff" opacity="0.37"/><circle cx="1556" cy="833" r="1.1" fill="#fff" opacity="0.34"/><circle cx="333" cy="79" r="0.9" fill="#fff" opacity="0.49"/><circle cx="231" cy="103" r="2.9" fill="#fff" opacity="0.43"/><circle cx="1684" cy="235" r="2.6" fill="#fff" opacity="0.27"/><circle cx="469" cy="514" r="1.5" fill="#fff" opacity="0.19"/><circle cx="1251" cy="872" r="1.4" fill="#fff" opacity="0.72"/><circle cx="684" cy="184" r="1.6" fill="#fff" opacity="0.49"/><circle cx="1740" cy="888" r="1.6" fill="#fff" opacity="0.34"/><circle cx="1050" cy="463" r="2.4" fill="#fff" opacity="0.36"/><circle cx="909" cy="154" r="2.0" fill="#fff" opacity="0.24"/><circle cx="762" cy="946" r="1.7" fill="#fff" opacity="0.73"/><circle cx="143" cy="809" r="2.0" fill="#fff" opacity="0.69"/><circle cx="828" cy="87" r="3.1" fill="#fff" opacity="0.20"/><circle cx="33" cy="62" r="1.5" fill="#fff" opacity="0.67"/><circle cx="1005" cy="358" r="1.1" fill="#fff" opacity="0.70"/><circle cx="295" cy="981" r="3.0" fill="#fff" opacity="0.68"/><circle cx="70" cy="516" r="1.3" fill="#fff" opacity="0.32"/><circle cx="1760" cy="762" r="1.8" fill="#fff" opacity="0.77"/><circle cx="8" cy="603" r="2.6" fill="#fff" opacity="0.75"/><circle cx="318" cy="684" r="2.5" fill="#fff" opacity="0.74"/><circle cx="423" cy="1033" r="2.5" fill="#fff" opacity="0.60"/><circle cx="1234" cy="352" r="1.1" fill="#fff" opacity="0.42"/><circle cx="899" cy="225" r="1.9" fill="#fff" opacity="0.66"/><circle cx="960" cy="560" r="760" fill="0,132,229" opacity="0.035"/><circle cx="960" cy="560" r="520" fill="0,132,229" opacity="0.045"/><circle cx="960" cy="560" r="320" fill="0,132,229" opacity="0.06"/><rect x="863" y="640" width="11" height="34" rx="5" fill="#fff" opacity="0.72"/><rect x="863" y="640" width="11" height="34" rx="5" fill="0,132,229" opacity="0.50"/><rect x="863" y="552" width="11" height="34" rx="5" fill="#fff" opacity="0.62"/><rect x="863" y="552" width="11" height="34" rx="5" fill="0,132,229" opacity="0.43"/><rect x="863" y="464" width="11" height="34" rx="5" fill="#fff" opacity="0.52"/><rect x="863" y="464" width="11" height="34" rx="5" fill="0,132,229" opacity="0.36"/><rect x="863" y="376" width="11" height="34" rx="5" fill="#fff" opacity="0.42"/><rect x="863" y="376" width="11" height="34" rx="5" fill="0,132,229" opacity="0.29"/><rect x="863" y="288" width="11" height="34" rx="5" fill="#fff" opacity="0.32"/><rect x="863" y="288" width="11" height="34" rx="5" fill="0,132,229" opacity="0.22"/><rect x="863" y="200" width="11" height="34" rx="5" fill="#fff" opacity="0.22"/><rect x="863" y="200" width="11" height="34" rx="5" fill="0,132,229" opacity="0.15"/><rect x="1047" y="640" width="11" height="34" rx="5" fill="#fff" opacity="0.72"/><rect x="1047" y="640" width="11" height="34" rx="5" fill="0,132,229" opacity="0.50"/><rect x="1047" y="552" width="11" height="34" rx="5" fill="#fff" opacity="0.62"/><rect x="1047" y="552" width="11" height="34" rx="5" fill="0,132,229" opacity="0.43"/><rect x="1047" y="464" width="11" height="34" rx="5" fill="#fff" opacity="0.52"/><rect x="1047" y="464" width="11" height="34" rx="5" fill="0,132,229" opacity="0.36"/><rect x="1047" y="376" width="11" height="34" rx="5" fill="#fff" opacity="0.42"/><rect x="1047" y="376" width="11" height="34" rx="5" fill="0,132,229" opacity="0.29"/><rect x="1047" y="288" width="11" height="34" rx="5" fill="#fff" opacity="0.32"/><rect x="1047" y="288" width="11" height="34" rx="5" fill="0,132,229" opacity="0.22"/><rect x="1047" y="200" width="11" height="34" rx="5" fill="#fff" opacity="0.22"/><rect x="1047" y="200" width="11" height="34" rx="5" fill="0,132,229" opacity="0.15"/><rect x="954" y="330" width="12" height="230" rx="6" fill="#fff" opacity=".55"/><rect x="954" y="330" width="12" height="230" rx="6" fill="0,132,229" opacity=".45"/><circle cx="1470" cy="268" r="230" fill="0,132,229" opacity="0.05"/><circle cx="1470" cy="268" r="170" fill="0,132,229" opacity="0.09"/><circle cx="1470" cy="268" r="118" fill="0,132,229" opacity="0.16"/><circle cx="1470" cy="268" r="72" fill="0,132,229" opacity="0.26"/><circle cx="1470" cy="268" r="40" fill="0,132,229" opacity="0.4"/><circle cx="1470" cy="268" r="17" fill="#fff" opacity=".92"/><path d="M1514 268L1582 268" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".45"/><path d="M1492 306L1526 365" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".45"/><path d="M1448 306L1414 365" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".45"/><path d="M1426 268L1358 268" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".45"/><path d="M1448 230L1414 171" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".45"/><path d="M1492 230L1526 171" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".45"/><g transform="translate(960 800) scale(1.85)"><path d="M0 -150L96 60L22 22L0 96L-22 22L-96 60Z" fill="rgba(0,132,229,0.98)"/><path d="M0 -150L0 96" stroke="#fff" stroke-width="3" opacity=".28"/><circle cx="0" cy="-28" r="15" fill="#fff" opacity=".9"/></g><rect x="954" y="960" width="13" height="210" rx="6" fill="0,132,229" opacity="0.50"/><rect x="954" y="970" width="13" height="178" rx="6" fill="0,132,229" opacity="0.42"/><rect x="954" y="980" width="13" height="146" rx="6" fill="0,132,229" opacity="0.34"/><rect x="954" y="990" width="13" height="114" rx="6" fill="0,132,229" opacity="0.26"/><rect x="954" y="1000" width="13" height="82" rx="6" fill="0,132,229" opacity="0.18"/></svg></span>
+    <span class="gcover-play"><svg viewBox="0 0 24 24"><path d="M8 5l11 7-11 7V5z" fill="currentColor"/></svg></span></a>
+  <div class="ghero-txt">
+    <span class="ghero-cat">射击 · PlayStation web</span>
+    <h1>太空射击</h1>
+    <p>击落每一架，直到屏幕空下来。</p>
+    <div class="ghero-meta">
+      <span>最高纪录 <b id="gBest">—</b></span>
+      <span>游玩时长 <b id="gTime">—</b></span>
+      <span>1 人</span>
+    </div>
+  </div>
+</section>
+<main class="stage gstage">
 <div class="hud"><div class="cell"><div class="k">得分</div><div class="v" id="score">0</div></div><div class="cell"><div class="k">生命</div><div class="v" id="life">3</div></div><div class="cell"><div class="k">最高</div><div class="v" id="best">0</div></div></div>
 <div class="panel ss"><canvas id="cv" width="360" height="440"></canvas></div>
 <div class="msg" id="msg"></div>
@@ -166,61 +203,209 @@ button{font-family:inherit;cursor:pointer;color:inherit}
 <p class="tips">← → 或拖动飞船，点"开火"/空格发射。击落敌机得分，别让它们撞到底部。</p>
 </main>
 <div class="overlay" id="ov" hidden><div class="box"><h2>游戏结束</h2><p id="ovp"></p><button class="btn" onclick="start();document.getElementById('ov').hidden=true">再来一局</button></div></div>
-<div class="hints">
-<div class="hint"><svg class="x" viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg><span>确认</span></div>
-<div class="hint"><svg class="o" viewBox="0 0 24 24" fill="none" stroke-width="2.6"><circle cx="12" cy="12" r="8.5"/></svg><span>返回</span></div>
-<div class="hint"><svg class="t" viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linejoin="round"><path d="M12 3l9 17H3z"/></svg><span>选项</span></div>
-<div class="hint"><svg class="s" viewBox="0 0 24 24" fill="none" stroke-width="2.4"><rect x="4" y="4" width="16" height="16" rx="2"/></svg><span>主页</span></div>
-</div>
-<div class="cc" id="cc"><div class="cc-box"><div class="cc-head"><b>控制中心</b><span>PS / Esc 关闭</span></div>
-<div class="cc-actions">
-<button class="cc-act" onclick="location.href='../'">返回游戏库</button>
-<button class="cc-act" onclick="location.reload()">重新开始</button>
-<button class="cc-act" onclick="document.getElementById('cc').classList.remove('on')">继续游戏</button>
-</div></div></div>
-<div class="afd-bar" id="afdBar" role="complementary" aria-label="赞助支持">
-<span class="afd-heart">&#9829;</span><span>本站为个人作品，喜欢的话可以在 <b>爱发电</b> 支持我</span><span class="afd-arrow">&#8594;</span>
-</div>
-<div class="afd-modal" id="afdModal" role="dialog" aria-modal="true" aria-labelledby="afdTitle">
- <div class="afd-card">
-  <button class="afd-close" id="afdClose" aria-label="关闭">&#215;</button>
-  <div class="afd-badge">&#9749; 爱发电</div>
-  <h3 id="afdTitle">喜欢这个网站吗？</h3>
-  <p>PlayStation web 是我业余时间做的小项目，完全免费、没有广告。如果它让你玩得开心，欢迎请我喝杯咖啡。</p>
-  <a class="afd-go" href="https://afdian.com/a/apple-pc" target="_blank" rel="noopener">前往爱发电支持 &#8594;</a>
-  <button class="afd-later" id="afdLater">以后再说</button>
+<div class="psm" id="psmenu">
+ <div class="psm-panel">
+  <div class="psm-head"><b>控制中心</b><span>Esc 关闭 · 游戏已暂停</span></div>
+  <div class="psm-user"><span class="av" id="psmAvatar"></span>
+    <div><b id="psmName">访客</b><i id="psmSub">正在游玩 太空射击</i></div></div>
+  <div class="psm-cards">
+    <button class="psm-card" data-act="resume"><b>继续游戏</b><i>回到 太空射击</i></button>
+    <button class="psm-card" data-act="restart"><b>重新开始</b><i>从头再来一局</i></button>
+    <button class="psm-card" data-act="home"><b>返回主页</b><i>回到系统主界面</i></button>
+    <button class="psm-card danger" data-act="quit"><b>关闭游戏</b><i>结束本次游玩</i></button>
+  </div>
+  <div class="psm-quick">
+    <button class="psm-q" data-act="resume"><svg viewBox="0 0 24 24"><path d="M8 5l11 7-11 7V5z"/></svg><span>继续</span></button>
+    <button class="psm-q" data-act="restart"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 108-8M4 4v5h5"/></svg><span>重开</span></button>
+    <button class="psm-q" data-act="home"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9H3v-9z"/></svg><span>主页</span></button>
+    <button class="psm-q" data-act="mute"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4zM17 9a4 4 0 010 6"/></svg><span>静音</span></button>
+    <button class="psm-q" data-act="full"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span>全屏</span></button>
+  </div>
  </div>
 </div>
 <script>
 
-(function(){function tick(){var d=new Date(),e=document.getElementById('sysclock');
-if(e)e.textContent=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)}
-tick();setInterval(tick,15000)})();
-(function(){var cc=document.getElementById('cc'),b=document.getElementById('psbtn');
-if(b)b.onclick=function(){cc.classList.toggle('on')};
-cc.onclick=function(e){if(e.target===cc)cc.classList.remove('on')};
-document.addEventListener('keydown',function(e){if(e.key==='Escape')cc.classList.remove('on');
- if(e.key==='p'||e.key==='P')cc.classList.toggle('on')})})();
+var PS_AV_SHAPES=['circle','triangle','square','cross','star','diamond','ring','wave'];
+var PS_AV_COLORS=[['#3a9bec','#0a4d92'],['#b06ae0','#4a1470'],['#3fc38a','#0f5c3c'],['#ff9f45','#8a3c00'],
+                  ['#ff6b8b','#8c1030'],['#3ecfcf','#0a5151'],['#e8c341','#6b4a00'],['#8b96a8','#2a3140']];
+var PS_AV_PATH={
+ 'circle':'<circle cx="50" cy="50" r="17" fill="#fff" opacity=".92"/>',
+ 'triangle':'<path d="M50 30l19 34H31z" fill="#fff" opacity=".92"/>',
+ 'square':'<rect x="34" y="34" width="32" height="32" rx="6" fill="#fff" opacity=".92"/>',
+ 'cross':'<path d="M44 30h12v14h14v12H56v14H44V56H30V44h14z" fill="#fff" opacity=".92"/>',
+ 'star':'<path d="M50 28l7 17 18 1-14 12 5 18-16-10-16 10 5-18-14-12 18-1z" fill="#fff" opacity=".92"/>',
+ 'diamond':'<path d="M50 30l20 20-20 20-20-20z" fill="#fff" opacity=".92"/>',
+ 'ring':'<circle cx="50" cy="50" r="17" fill="none" stroke="#fff" stroke-width="7" opacity=".92"/>',
+ 'wave':'<path d="M30 44c7-8 14 8 21 0s14 8 21 0M30 58c7-8 14 8 21 0s14 8 21 0" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" opacity=".92"/>'
+};
+function PS_avatarHTML(i,uid){
+  i=((i|0)%8+8)%8;var sh=PS_AV_SHAPES[i],g='psav'+(uid||'')+i;
+  return '<svg viewBox="0 0 100 100"><defs><linearGradient id="'+g+'" x1="0" y1="0" x2="1" y2="1">'+
+    '<stop stop-color="'+PS_AV_COLORS[i][0]+'"/><stop offset="1" stop-color="'+PS_AV_COLORS[i][1]+'"/></linearGradient></defs>'+
+    '<rect width="100" height="100" rx="50" fill="url(#'+g+')"/>'+PS_AV_PATH[sh]+'</svg>';
+}
+function PS_users(){try{var a=JSON.parse(localStorage.getItem('psweb_users')||'[]');return Array.isArray(a)?a:[]}catch(e){return []}}
+function PS_saveUsers(a){try{localStorage.setItem('psweb_users',JSON.stringify(a))}catch(e){}}
+function PS_uid(){try{return localStorage.getItem('psweb_uid')||''}catch(e){return ''}}
+function PS_setUid(id){try{localStorage.setItem('psweb_uid',id)}catch(e){}}
+function PS_getUser(){
+  var a=PS_users(),id=PS_uid(),u=null,i;
+  if(id){for(i=0;i<a.length;i++){if(a[i].id===id)u=a[i]}}
+  if(!u&&a.length)u=a[0];
+  if(!u){
+    try{var old=JSON.parse(localStorage.getItem('psweb_user')||'null');
+      if(old){old.id='u0';PS_saveUsers([old]);PS_setUid('u0');u=old}
+    }catch(e){}
+  }
+  return u;
+}
+function PS_setUser(u){
+  var a=PS_users(),i,found=false;
+  if(!u.id)u.id='u'+Date.now();
+  for(i=0;i<a.length;i++){if(a[i].id===u.id){a[i]=u;found=true}}
+  if(!found)a.push(u);
+  PS_saveUsers(a);PS_setUid(u.id);
+  return u;
+}
+function PS_clearUser(){try{localStorage.removeItem('psweb_uid')}catch(e){}}
+
+
+/* ---- PS5 系统音效（Web Audio 合成，无外部素材） ---- */
+var PS_SFX=(function(){
+  var ctx=null,master=null,muted=false;
+  try{muted=localStorage.getItem('psweb_mute')==='1'}catch(e){}
+  function ac(){
+    if(ctx){if(ctx.state==='suspended'){try{ctx.resume()}catch(e){}}return ctx}
+    var AC=window.AudioContext||window.webkitAudioContext;
+    if(!AC)return null;
+    try{ctx=new AC()}catch(e){return null}
+    master=ctx.createGain();
+    master.gain.value=muted?0:0.24;
+    master.connect(ctx.destination);
+    return ctx;
+  }
+  function tone(f,dur,type,vol,to,delay){
+    if(muted)return;
+    var c=ac();if(!c)return;
+    var t=c.currentTime+(delay||0);
+    var o=c.createOscillator(),g=c.createGain();
+    o.type=type||'sine';
+    o.frequency.setValueAtTime(f,t);
+    if(to)o.frequency.exponentialRampToValueAtTime(to,t+dur);
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.exponentialRampToValueAtTime(vol,t+0.006);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    o.connect(g);g.connect(master);
+    o.start(t);o.stop(t+dur+0.03);
+  }
+  function sweep(dur,vol,f1,f2){
+    if(muted)return;
+    var c=ac();if(!c)return;
+    var len=Math.floor(c.sampleRate*dur);
+    if(len<=0)return;
+    var buf=c.createBuffer(1,len,c.sampleRate),d=buf.getChannelData(0);
+    for(var i=0;i<len;i++)d[i]=(Math.random()*2-1)*(1-i/len);
+    var src=c.createBufferSource();src.buffer=buf;
+    var bp=c.createBiquadFilter();bp.type='bandpass';bp.Q.value=1.1;
+    var t=c.currentTime;
+    bp.frequency.setValueAtTime(f1,t);
+    bp.frequency.exponentialRampToValueAtTime(f2,t+dur);
+    var g=c.createGain();
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.exponentialRampToValueAtTime(vol,t+dur*0.26);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    src.connect(bp);bp.connect(g);g.connect(master);
+    src.start(t);src.stop(t+dur);
+  }
+  return {
+    unlock:function(){ac()},
+    tap:function(){tone(960,0.028,'sine',0.055)},
+    move:function(){tone(1240,0.042,'sine',0.085)},
+    hover:function(){tone(1520,0.026,'sine',0.04)},
+    confirm:function(){tone(784,0.07,'sine',0.16);tone(1175,0.1,'sine',0.12,null,0.045)},
+    back:function(){tone(660,0.075,'sine',0.14);tone(440,0.11,'sine',0.1,null,0.04)},
+    open:function(){tone(520,0.1,'triangle',0.13,780)},
+    close:function(){tone(700,0.1,'triangle',0.11,430)},
+    launch:function(){sweep(0.8,0.16,320,2800);tone(110,0.75,'sine',0.2,430);tone(220,0.5,'triangle',0.08,660,0.06)},
+    boot:function(){tone(92,1.5,'sine',0.2,300);tone(184,1.15,'triangle',0.075,560,0.12);sweep(1.25,0.05,180,1400)},
+    trophy:function(){var n=[523,659,784,1046];for(var i=0;i<n.length;i++)tone(n[i],0.3,'sine',0.13,null,i*0.09)},
+    error:function(){tone(200,0.09,'square',0.08);tone(160,0.14,'square',0.07,null,0.1)},
+    setMuted:function(v){muted=!!v;if(master)master.gain.value=muted?0:0.24;
+      try{localStorage.setItem('psweb_mute',muted?'1':'0')}catch(e){}},
+    isMuted:function(){return muted}
+  };
+})();
+
+
+/* ---- 会话：用户 / 游玩时长 / PS 菜单 ---- */
+(function(){
+  var SLUG=location.pathname.replace(/\/+$/,'').split('/').pop()||'index';
+  var U=PS_getUser();
+  var name=U&&U.name?U.name:'访客', ai=U&&U.avatar!=null?U.avatar:0;
+  function paint(id){var el=document.getElementById(id);if(el)el.innerHTML=PS_avatarHTML(ai,id)}
+  paint('gAvatar');paint('psmAvatar');
+  var n1=document.getElementById('gUser');if(n1)n1.textContent=name;
+  var n2=document.getElementById('psmName');if(n2)n2.textContent=name;
+
+  /* 最高分回填 */
+  var best=+(localStorage.getItem('gc_'+SLUG)||0);
+  var gb=document.getElementById('gBest');if(gb)gb.textContent=best?best:'—';
+  /* 游玩时长 */
+  var tkey='psweb_time_'+SLUG;
+  var spent=+(localStorage.getItem(tkey)||0);
+  function fmt(s){if(s<60)return Math.round(s)+' 秒';if(s<3600)return Math.round(s/60)+' 分钟';return (s/3600).toFixed(1)+' 小时'}
+  var gt=document.getElementById('gTime');if(gt)gt.textContent=spent?fmt(spent):'首次游玩';
+  var t0=Date.now(),closed=false;
+  function flush(){if(closed)return;closed=true;
+    try{var add=(Date.now()-t0)/1000;localStorage.setItem(tkey,String(+(localStorage.getItem(tkey)||0)+add))}catch(e){}}
+  window.addEventListener('beforeunload',flush);
+  document.addEventListener('visibilitychange',function(){if(document.hidden)flush()});
+
+  /* PS 菜单 */
+  var psm=document.getElementById('psmenu');
+  function openPS(){if(!psm)return;psm.classList.add('on');PS_SFX.open();if(window.PS_PAUSE)window.PS_PAUSE(true)}
+  function closePS(){if(!psm)return;psm.classList.remove('on');PS_SFX.close();if(window.PS_PAUSE)window.PS_PAUSE(false)}
+  function paused(){return psm&&psm.classList.contains('on')}
+  var pb=document.getElementById('psbtn');if(pb)pb.onclick=function(){paused()?closePS():openPS()};
+  if(psm){
+    psm.onclick=function(e){if(e.target===psm)closePS()};
+    psm.querySelectorAll('[data-act]').forEach(function(b){
+      b.onclick=function(){
+        var a=b.dataset.act;
+        if(a==='resume')closePS();
+        else if(a==='restart'){flush();location.reload()}
+        else if(a==='home'){flush();location.href='../'}
+        else if(a==='quit'){flush();location.href='../'}
+        else if(a==='full'){if(!document.fullscreenElement){document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen()}else{document.exitFullscreen&&document.exitFullscreen()}}
+        else if(a==='mute'){document.body.classList.toggle('muted')}
+      };
+    });
+  }
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'){
+      if(psm&&psm.classList.contains('on')){closePS();e.preventDefault();return}
+      var ov=document.querySelector('.overlay:not([hidden])');
+      if(!ov)openPS();
+    }
+    if(e.key==='p'||e.key==='P'){paused()?closePS():openPS()}
+  },true);
+  window.PS_OPEN_PS=openPS;window.PS_CLOSE_PS=closePS;
+  /* 按钮轻音效 */
+  document.addEventListener('click',function(e){
+    var t=e.target&&e.target.closest?e.target.closest('button,.btn'):null;
+    if(t)PS_SFX.tap();
+  },true);
+  ['pointerdown','keydown','touchstart'].forEach(function(ev){
+    document.addEventListener(ev,function once(){PS_SFX.unlock();document.removeEventListener(ev,once)},false);
+  });
+})();
+/* 进场 */
+requestAnimationFrame(function(){document.body.classList.add('ready')});
 
 
 function hiGet(k){try{return +(localStorage.getItem('gc_'+k)||0)}catch(e){return 0}}
 function hiSet(k,v){try{localStorage.setItem('gc_'+k,v)}catch(e){}}
 function setMsg(t){var m=document.getElementById('msg');if(m)m.textContent=t||''}
-
-
-(function(){var M=document.getElementById('afdModal'),B=document.getElementById('afdBar');
-if(!M)return;
-var KEY='afd_dismissed';
-function close(){M.classList.remove('on');try{localStorage.setItem(KEY,'1')}catch(e){}}
-function open(){M.classList.add('on')}
-var c=document.getElementById('afdClose'),l=document.getElementById('afdLater');
-if(c)c.onclick=close;if(l)l.onclick=close;
-M.onclick=function(e){if(e.target===M)close()};
-document.addEventListener('keydown',function(e){if(e.key==='Escape'&&M.classList.contains('on'))close()});
-if(B)B.onclick=function(){window.open('https://afdian.com/a/apple-pc','_blank','noopener')};
-var seen=false;try{seen=localStorage.getItem(KEY)==='1'}catch(e){}
-if(!seen)setTimeout(open,1200);
-})();
 
 
 var cv=document.getElementById('cv'),ctx=cv.getContext('2d'),W=cv.width,H=cv.height;

@@ -77,7 +77,7 @@ body:after{content:"";position:fixed;inset:0;z-index:2;pointer-events:none;opaci
 .gsel.on{display:block;animation:sIn 380ms var(--ease)}
 @keyframes sIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .gsel-cat{font-size:10px;letter-spacing:.22em;color:rgba(255,255,255,.44);text-transform:uppercase;font-weight:600}
-.gsel h1{font-size:clamp(30px,3.2vw,46px);font-weight:600;letter-spacing:-.03em;line-height:1.06;margin-top:9px}
+.gsel h1,.gsel .gsel-t{font-size:clamp(30px,3.2vw,46px);font-weight:600;letter-spacing:-.03em;line-height:1.06;margin-top:9px}
 .gsel p{font-size:13.5px;color:rgba(255,255,255,.56);margin-top:9px}
 .cards{display:flex;gap:14px;margin-top:26px;flex-wrap:wrap}
 .acard{position:relative;flex:0 0 auto;width:clamp(198px,22vw,306px);min-height:162px;border-radius:7px;padding:16px 18px;
@@ -350,7 +350,7 @@ body:after{content:"";position:fixed;inset:0;z-index:2;pointer-events:none;opaci
 
 @media(max-width:1180px){.grid{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:900px){:root{--pad:22px}.rail{top:78px}.tray{top:250px;bottom:104px}
- .acard{width:calc(46% - 7px);min-width:150px}.gsel h1{font-size:30px}.psm-cards{grid-template-columns:repeat(2,1fr)}}
+ .acard{width:calc(46% - 7px);min-width:150px}.gsel h1,.gsel .gsel-t{font-size:30px}.psm-cards{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:760px){.rail{overflow-x:auto;overflow-y:hidden;scrollbar-width:none;gap:10px;padding:24px 14px 14px;margin:0 -14px}.rail::-webkit-scrollbar{display:none}.tile{flex:0 0 138px;transform-origin:bottom center}.tray{top:224px}.hints{display:none}.bar{justify-content:flex-end}}
 @media(max-width:600px){.tile{flex:0 0 128px}.gsel p{display:none}.cards{gap:9px;margin-top:18px}
  .acard{min-height:104px;padding:12px 14px}.acard-v{font-size:17px}.hints .hint:nth-child(3){display:none}
@@ -405,7 +405,7 @@ body:after{content:"";position:fixed;inset:0;z-index:2;pointer-events:none;opaci
 </button></div>
   <div class="tray" id="tray"><section class="gsel" data-slug="2048">
   <div class="gsel-cat">益智 · PlayStation web</div>
-  <h1>2048</h1>
+  <h2 class="gsel-t">2048</h2>
   <p>合并相同的数字，一块一块推到 2048。</p>
   <div class="cards">
     <button class="acard acard-play" data-launch="2048">
@@ -436,7 +436,7 @@ body:after{content:"";position:fixed;inset:0;z-index:2;pointer-events:none;opaci
   </div>
 </section><section class="gsel" data-slug="snake">
   <div class="gsel-cat">街机 · PlayStation web</div>
-  <h1>贪吃蛇</h1>
+  <h2 class="gsel-t">贪吃蛇</h2>
   <p>吞下果实，越来越长，别咬到自己。</p>
   <div class="cards">
     <button class="acard acard-play" data-launch="snake">
@@ -467,7 +467,7 @@ body:after{content:"";position:fixed;inset:0;z-index:2;pointer-events:none;opaci
   </div>
 </section><section class="gsel" data-slug="minesweeper">
   <div class="gsel-cat">益智 · PlayStation web</div>
-  <h1>扫雷</h1>
+  <h2 class="gsel-t">扫雷</h2>
   <p>八十一格里有十颗雷，靠数字推理找出来。</p>
   <div class="cards">
     <button class="acard acard-play" data-launch="minesweeper">
@@ -498,7 +498,7 @@ body:after{content:"";position:fixed;inset:0;z-index:2;pointer-events:none;opaci
   </div>
 </section><section class="gsel" data-slug="tictactoe">
   <div class="gsel-cat">对决 · PlayStation web</div>
-  <h1>井字棋</h1>
+  <h2 class="gsel-t">井字棋</h2>
   <p>九个格子，谁先连成三个。</p>
   <div class="cards">
     <button class="acard acard-play" data-launch="tictactoe">
@@ -529,7 +529,7 @@ body:after{content:"";position:fixed;inset:0;z-index:2;pointer-events:none;opaci
   </div>
 </section><section class="gsel" data-slug="memory">
   <div class="gsel-cat">记忆 · PlayStation web</div>
-  <h1>记忆翻牌</h1>
+  <h2 class="gsel-t">记忆翻牌</h2>
   <p>翻开来，记住它，再翻回去。</p>
   <div class="cards">
     <button class="acard acard-play" data-launch="memory">
@@ -560,7 +560,7 @@ body:after{content:"";position:fixed;inset:0;z-index:2;pointer-events:none;opaci
   </div>
 </section><section class="gsel" data-slug="tetris">
   <div class="gsel-cat">街机 · PlayStation web</div>
-  <h1>俄罗斯方块</h1>
+  <h2 class="gsel-t">俄罗斯方块</h2>
   <p>旋转、落下、消除。永远差最后一块。</p>
   <div class="cards">
     <button class="acard acard-play" data-launch="tetris">
@@ -591,7 +591,7 @@ body:after{content:"";position:fixed;inset:0;z-index:2;pointer-events:none;opaci
   </div>
 </section><section class="gsel" data-slug="gomoku">
   <div class="gsel-cat">棋类 · PlayStation web</div>
-  <h1>五子棋</h1>
+  <h2 class="gsel-t">五子棋</h2>
   <p>十五路棋盘，五子连珠定胜负。</p>
   <div class="cards">
     <button class="acard acard-play" data-launch="gomoku">
@@ -622,7 +622,7 @@ body:after{content:"";position:fixed;inset:0;z-index:2;pointer-events:none;opaci
   </div>
 </section><section class="gsel" data-slug="spaceshooter">
   <div class="gsel-cat">射击 · PlayStation web</div>
-  <h1>太空射击</h1>
+  <h2 class="gsel-t">太空射击</h2>
   <p>击落每一架，直到屏幕空下来。</p>
   <div class="cards">
     <button class="acard acard-play" data-launch="spaceshooter">
@@ -801,7 +801,7 @@ body:after{content:"";position:fixed;inset:0;z-index:2;pointer-events:none;opaci
 <div class="gate" id="create">
   <div class="gate-in">
     <span class="gate-k">新用户</span>
-    <h1>创建一个用户</h1>
+    <h2>创建一个用户</h2>
     <div class="avgrid" id="avGrid"></div>
     <input class="nameinput" id="nameInput" maxlength="12" placeholder="输入昵称" autocomplete="off">
     <div class="gate-actions">

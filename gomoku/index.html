@@ -3,50 +3,112 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>五子棋 · 课间游戏中心</title>
-<meta name="theme-color" content="#f5f5f7">
+<title>五子棋 · PlayStation web</title>
+<meta name="theme-color" content="#0a0e1a">
+<meta name="description" content="五子棋 — PlayStation web 游戏库，打开即玩，成绩自动保存在本机。">
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <style>
 :root{--accent:#ff9500}
 
-:root{--bg:#f5f5f7;--paper:#fff;--ink:#1d1d1f;--ink2:#6e6e73;--ink3:#9a9a9e;
---line:rgba(0,0,0,.09);--accent:#0a84ff;--shadow:0 18px 50px -28px rgba(0,0,0,.28);--r:20px}
+:root{
+  --bg:#0a0e1a;--paper:rgba(22,30,54,.76);--ink:#f4f7ff;--ink2:#aebbd4;--ink3:#7886a3;
+  --line:rgba(160,190,255,.14);--accent:#0070d1;--accent-hi:#4da3ff;
+  --shadow:0 26px 60px -26px rgba(0,0,0,.85), inset 0 1px 0 rgba(255,255,255,.06);
+  --r:20px;--ease:cubic-bezier(.25,.1,.25,1)
+}
 *{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%}
-body{background:var(--bg);color:var(--ink);
-font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC","Microsoft YaHei",sans-serif;
--webkit-font-smoothing:antialiased;min-height:100vh;line-height:1.5}
+body{
+  background:radial-gradient(1100px 620px at 10% -12%,rgba(10,95,192,.32),transparent 62%),
+    radial-gradient(900px 600px at 94% 4%,rgba(75,42,158,.26),transparent 60%),
+    radial-gradient(820px 520px at 50% 110%,rgba(6,61,134,.20),transparent 66%),
+    linear-gradient(180deg,#0d1428 0%,#070a14 66%,#060811 100%);
+  background-attachment:fixed;color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC","Microsoft YaHei",sans-serif;
+  -webkit-font-smoothing:antialiased;min-height:100vh;line-height:1.5;overflow-x:hidden
+}
 a{color:inherit;text-decoration:none}
-button{font-family:inherit;cursor:pointer}
-.top{position:sticky;top:0;z-index:20;background:rgba(245,245,247,.8);
-backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);
-border-bottom:1px solid var(--line)}
-.top-in{max-width:640px;margin:0 auto;padding:0 18px;height:52px;display:flex;align-items:center;gap:12px}
-.back{display:inline-flex;align-items:center;gap:6px;color:var(--ink2);font-size:14px;transition:color .2s}
-.back:hover{color:var(--ink)}
-.back svg{width:16px;height:16px}
-.top .name{font-weight:650;font-size:16px;letter-spacing:-.2px}
+button{font-family:inherit;cursor:pointer;color:inherit}
+:focus-visible{outline:2px solid var(--accent-hi);outline-offset:3px;border-radius:10px}
+::selection{background:rgba(0,112,193,.55);color:#fff}
+/* 系统状态栏 */
+.sysbar{height:30px;padding:0 26px;display:flex;align-items:center;gap:11px;font-size:10.5px;
+ letter-spacing:.9px;color:var(--ink2);background:rgba(4,7,16,.6);border-bottom:1px solid rgba(0,112,193,.14)}
+.sysbar .ps{display:flex;align-items:center;gap:7px;font-weight:700;color:#e8f0ff}
+.sysbar .ps svg{width:16px;height:16px}
+.sysbar .sp{flex:1}
+.sysbar .clock{font-variant-numeric:tabular-nums;color:#dbe6ff;letter-spacing:.5px}
+.sysbar .me{display:flex;align-items:center;gap:6px;color:#e8f0ff}
+.sysbar .me .dot{width:7px;height:7px;border-radius:50%;background:#4da3ff;box-shadow:0 0 9px #4da3ff}
+.sysbar .ava{width:19px;height:19px;border-radius:50%;background:linear-gradient(135deg,#1684de,#004b94);display:grid;place-items:center;font-size:9px;font-weight:700}
+.sysbar .ic{width:13px;height:13px;opacity:.8}
+/* 顶栏 */
+.top{position:sticky;top:0;z-index:30;height:62px;display:flex;align-items:center;gap:10px;padding:0 24px;
+ background:rgba(11,16,32,.72);backdrop-filter:blur(26px) saturate(150%);-webkit-backdrop-filter:blur(26px) saturate(150%);
+ border-bottom:1px solid rgba(77,163,255,.16)}
+.top::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:linear-gradient(90deg,transparent,rgba(77,163,255,.45),transparent)}
+.top .home{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;color:var(--ink2);background:rgba(255,255,255,.05);transition:all 220ms var(--ease)}
+.top .home:hover{color:#fff;background:rgba(0,112,193,.24)}
+.top .home svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round}
+.back{display:inline-flex;align-items:center;gap:6px;color:var(--ink2);font-size:12.5px;
+ border:1px solid rgba(160,190,255,.16);border-radius:999px;padding:6px 13px;background:rgba(255,255,255,.035);
+ transition:all 220ms var(--ease)}
+.back:hover{color:#fff;border-color:rgba(77,163,255,.55);background:rgba(0,112,193,.18)}
+.back svg{width:15px;height:15px}
+.top .name{font-weight:600;font-size:15px;letter-spacing:.2px}
 .top .spacer{flex:1}
-.top .badge{font-size:11px;color:var(--ink3);border:1px solid var(--line);padding:4px 10px;border-radius:999px}
-.stage{max-width:640px;margin:0 auto;padding:22px 18px 60px}
-.panel{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:20px}
+.top .badge{font-size:10.5px;color:#bcd6ff;border:1px solid rgba(0,112,193,.4);background:rgba(0,112,193,.14);padding:4px 11px;border-radius:999px}
+.top .psbtn{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;
+ background:linear-gradient(135deg,#1684de,#004b94);color:#fff;box-shadow:0 0 20px rgba(0,112,193,.5)}
+.top .psbtn svg{width:17px;height:17px;fill:#fff}
+/* 舞台与玻璃面板 */
+.stage{max-width:680px;margin:0 auto;padding:26px 18px 110px}
+.panel{background:linear-gradient(155deg,rgba(30,41,72,.78),rgba(14,20,38,.76));border:1px solid var(--line);
+ border-radius:var(--r);box-shadow:var(--shadow);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:20px}
 .hud{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:0 0 18px}
-.hud .cell{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:8px 16px;text-align:center;min-width:86px}
-.hud .cell .k{font-size:11px;color:var(--ink3);letter-spacing:.4px}
-.hud .cell .v{font-size:20px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
-.controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
-.btn{border:none;background:var(--ink);color:#fff;padding:11px 20px;border-radius:999px;font-size:14px;font-weight:600;transition:transform .15s,opacity .15s}
-.btn:hover{transform:translateY(-1px)}
+.hud .cell{background:rgba(14,20,38,.64);border:1px solid var(--line);border-radius:14px;padding:8px 16px;text-align:center;min-width:86px;backdrop-filter:blur(12px)}
+.hud .cell .k{font-size:11px;color:var(--ink3);letter-spacing:.6px}
+.hud .cell .v{font-size:20px;font-weight:650;margin-top:2px;font-variant-numeric:tabular-nums;color:#fff;text-shadow:0 0 18px rgba(77,163,255,.28)}
+.controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+.btn{border:1px solid rgba(255,255,255,.2);border-radius:999px;background:linear-gradient(180deg,#1684de,#0064b4);color:#fff;
+ padding:11px 22px;font-size:14px;font-weight:600;box-shadow:0 8px 22px -8px rgba(0,112,193,.85),inset 0 1px 0 rgba(255,255,255,.22);
+ transition:transform 220ms var(--ease),box-shadow 220ms var(--ease),filter 220ms var(--ease)}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.08)}
 .btn:active{transform:scale(.97)}
-.btn.sec{background:#e8e8ed;color:var(--ink)}
-.tips{margin-top:16px;text-align:center;color:var(--ink3);font-size:12.5px;line-height:1.7}
-.msg{text-align:center;font-size:15px;color:var(--ink2);margin:10px 0;min-height:22px}
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.42);display:flex;align-items:center;justify-content:center;z-index:40;padding:24px}
+.btn.sec{background:rgba(255,255,255,.075);color:#e6edff;border-color:rgba(160,190,255,.2);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+.btn.sec:hover{background:rgba(255,255,255,.13);box-shadow:none}
+.tips{margin-top:18px;text-align:center;color:var(--ink3);font-size:12.5px;line-height:1.75}
+.msg{text-align:center;font-size:14px;color:#bcd6ff;margin:10px 0;min-height:22px}
+.overlay{position:fixed;inset:0;background:rgba(3,5,12,.76);backdrop-filter:blur(12px);
+ display:flex;align-items:center;justify-content:center;z-index:60;padding:24px}
 .overlay[hidden]{display:none}
-.overlay .box{background:#fff;border-radius:22px;padding:30px 34px;text-align:center;max-width:340px;width:100%;box-shadow:0 30px 80px rgba(0,0,0,.3)}
-.overlay .box h2{font-size:24px;margin-bottom:8px}
-.overlay .box p{color:var(--ink2);font-size:14px;margin-bottom:20px}
+.overlay .box{background:linear-gradient(155deg,rgba(32,44,78,.96),rgba(14,20,38,.96));border:1px solid rgba(77,163,255,.32);
+ border-radius:22px;padding:32px 34px;text-align:center;max-width:340px;width:100%;box-shadow:0 30px 90px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.08)}
+.overlay .box h2{font-size:24px;font-weight:650;margin-bottom:8px}
+.overlay .box p{color:var(--ink2);font-size:14px;margin-bottom:22px}
 .hidden{display:none!important}
+/* PS5 手柄按键提示条 */
+.hints{position:fixed;left:0;right:0;bottom:0;z-index:35;height:54px;display:flex;align-items:center;justify-content:center;gap:30px;
+ background:linear-gradient(180deg,transparent,rgba(4,7,16,.92) 42%);font-size:11.5px;color:var(--ink2)}
+.hint{display:flex;align-items:center;gap:7px}
+.hint svg{width:17px;height:17px}
+.hint .x{stroke:#2f9bff}.hint .o{stroke:#e8455d}.hint .t{stroke:#37c98b}.hint .s{stroke:#c878dd}
+/* 控制中心 */
+.cc{position:fixed;inset:0;z-index:70;background:rgba(3,5,12,.6);backdrop-filter:blur(16px);
+ display:none;align-items:flex-end;justify-content:center;padding:0 0 64px}
+.cc.on{display:flex}
+.cc-box{width:min(560px,94vw);background:linear-gradient(160deg,rgba(26,36,64,.96),rgba(11,16,31,.97));
+ border:1px solid rgba(77,163,255,.26);border-radius:22px;padding:22px;box-shadow:0 30px 80px rgba(0,0,0,.8)}
+.cc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.cc-head b{font-size:14px}.cc-head span{font-size:11px;color:var(--ink3)}
+.cc-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.cc-act{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center;font-size:12px;transition:all 220ms var(--ease)}
+.cc-act:hover{border-color:var(--hi);background:rgba(0,112,193,.15)}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-track{background:#070a14}
+::-webkit-scrollbar-thumb{background:rgba(100,135,200,.3);border-radius:9px}
+@media(max-width:520px){.sysbar{padding:0 14px}.sysbar .net{display:none}.stage{padding-top:18px}.hints{gap:12px}.hint span{display:none}}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 
 
 .gm{background:#e8c98f;border-radius:12px;position:relative;width:min(390px,92vw);aspect-ratio:1;margin:0 auto;
@@ -56,10 +118,15 @@ box-shadow:inset 0 0 30px rgba(0,0,0,.1)}
 </style>
 </head>
 <body>
-<header class="top"><div class="top-in">
-<a class="back" href="../"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>游戏中心</a>
+<div class="sysbar"><span class="ps"><svg viewBox="0 0 24 24"><path d="M6 3c6-1 10 1 10 5 0 3-2 4-5 5l5 8h-4l-4-7H9v7H6V3z" fill="currentColor"/></svg>PLAYSTATION WEB</span>
+<span class="sp"></span><svg class="ic net" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8.5a15 15 0 0120 0M5 12a10 10 0 0114 0M8.5 15.5a5 5 0 017 0"/><circle cx="12" cy="19" r="1" fill="currentColor"/></svg>
+<span class="clock" id="sysclock">--:--</span><span class="me"><i class="dot"></i><span class="ava">Z</span>梓涵</span></div>
+<header class="top">
+<a class="home" href="../" title="主页"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1v-9z"/></svg></a>
+<a class="back" href="../"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>游戏库</a>
 <span class="name">五子棋</span><span class="spacer"></span><span class="badge">对战</span>
-</div></header>
+<button class="psbtn" id="psbtn" title="控制中心"><svg viewBox="0 0 24 24"><path d="M6 3c6-1 10 1 10 5 0 3-2 4-5 5l5 8h-4l-4-7H9v7H6V3z"/></svg></button>
+</header>
 <main class="stage">
 <div class="hud"><div class="cell"><div class="k">对手</div><div class="v" style="font-size:15px">电脑 AI</div></div><div class="cell"><div class="k">你执</div><div class="v" style="font-size:15px">黑 ●</div></div></div>
 <div class="panel"><div class="gm"><canvas id="cv" width="390" height="390"></canvas></div></div>
@@ -68,7 +135,34 @@ box-shadow:inset 0 0 30px rgba(0,0,0,.1)}
 <p class="tips">点击交叉点落子，先连成五子者胜。你执黑先手，AI 执白。</p>
 </main>
 <div class="overlay" id="ov" hidden><div class="box"><h2 id="ovt"></h2><p id="ovp"></p><button class="btn" onclick="start();document.getElementById('ov').hidden=true">再来一局</button></div></div>
+<div class="hints">
+<div class="hint"><svg class="x" viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg><span>确认</span></div>
+<div class="hint"><svg class="o" viewBox="0 0 24 24" fill="none" stroke-width="2.6"><circle cx="12" cy="12" r="8.5"/></svg><span>返回</span></div>
+<div class="hint"><svg class="t" viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linejoin="round"><path d="M12 3l9 17H3z"/></svg><span>选项</span></div>
+<div class="hint"><svg class="s" viewBox="0 0 24 24" fill="none" stroke-width="2.4"><rect x="4" y="4" width="16" height="16" rx="2"/></svg><span>主页</span></div>
+</div>
+<div class="cc" id="cc"><div class="cc-box"><div class="cc-head"><b>控制中心</b><span>PS / Esc 关闭</span></div>
+<div class="cc-actions">
+<button class="cc-act" onclick="location.href='../'">返回游戏库</button>
+<button class="cc-act" onclick="location.reload()">重新开始</button>
+<button class="cc-act" onclick="document.getElementById('cc').classList.remove('on')">继续游戏</button>
+</div></div></div>
 <script>
+
+(function(){function tick(){var d=new Date(),e=document.getElementById('sysclock');
+if(e)e.textContent=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)}
+tick();setInterval(tick,15000)})();
+(function(){var cc=document.getElementById('cc'),b=document.getElementById('psbtn');
+if(b)b.onclick=function(){cc.classList.toggle('on')};
+cc.onclick=function(e){if(e.target===cc)cc.classList.remove('on')};
+document.addEventListener('keydown',function(e){if(e.key==='Escape')cc.classList.remove('on');
+ if(e.key==='p'||e.key==='P')cc.classList.toggle('on')})})();
+
+
+function hiGet(k){try{return +(localStorage.getItem('gc_'+k)||0)}catch(e){return 0}}
+function hiSet(k,v){try{localStorage.setItem('gc_'+k,v)}catch(e){}}
+function setMsg(t){var m=document.getElementById('msg');if(m)m.textContent=t||''}
+
 
 var N=13,cv=document.getElementById('cv'),ctx=cv.getContext('2d'),cell=cv.width/(N+1),b,turn,over;
 function start(){b=Array.from({length:N},()=>Array(N).fill(0));turn=1;over=false;document.getElementById('ov').hidden=true;setMsg('你先手');draw()}

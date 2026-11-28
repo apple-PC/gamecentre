@@ -151,6 +151,7 @@ main.stage{position:relative;z-index:1}
 .psm-q{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px 4px;border-radius:8px;
  font-size:9.5px;color:rgba(255,255,255,.42);transition:.2s var(--ease)}
 .psm-q:hover{background:rgba(255,255,255,.08);color:#fff}
+.psm-q.on{background:rgba(255,255,255,.14);color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.18)}
 .psm-q svg{width:17px;height:17px;stroke-width:1.7;fill:none;stroke:currentColor}
 
 ::-webkit-scrollbar{width:9px;height:9px}
@@ -225,7 +226,7 @@ font-weight:700;font-size:15px;user-select:none;transition:background .1s}
     <button class="psm-q" data-act="resume"><svg viewBox="0 0 24 24"><path d="M8 5l11 7-11 7V5z"/></svg><span>继续</span></button>
     <button class="psm-q" data-act="restart"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 108-8M4 4v5h5"/></svg><span>重开</span></button>
     <button class="psm-q" data-act="home"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9H3v-9z"/></svg><span>主页</span></button>
-    <button class="psm-q" data-act="mute"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4zM17 9a4 4 0 010 6"/></svg><span>静音</span></button>
+    <button class="psm-q" data-act="mute" id="psmMute"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4zM17 9a4 4 0 010 6"/></svg><span id="psmMuteT">静音</span></button>
     <button class="psm-q" data-act="full"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span>全屏</span></button>
   </div>
  </div>
@@ -337,6 +338,22 @@ var PS_SFX=(function(){
     boot:function(){tone(92,1.5,'sine',0.2,300);tone(184,1.15,'triangle',0.075,560,0.12);sweep(1.25,0.05,180,1400)},
     trophy:function(){var n=[523,659,784,1046];for(var i=0;i<n.length;i++)tone(n[i],0.3,'sine',0.13,null,i*0.09)},
     error:function(){tone(200,0.09,'square',0.08);tone(160,0.14,'square',0.07,null,0.1)},
+    /* ---- 游戏内音效 ---- */
+    place:function(){tone(215,0.08,'triangle',0.13,145)},
+    pop:function(){tone(1180,0.07,'sine',0.09,1620)},
+    merge:function(v){var f=460+Math.min(6,Math.log(v||2)/Math.LN2)*72;tone(f,0.15,'sine',0.14,f*1.5)},
+    clearLine:function(n){var b=[659,784,988,1318],k=Math.max(1,Math.min(n||1,4));
+      for(var i=0;i<k;i++)tone(b[i],0.2,'sine',0.11,null,i*0.055)},
+    flip:function(){sweep(0.09,0.05,1100,3000)},
+    match:function(){tone(880,0.09,'sine',0.13);tone(1318,0.15,'sine',0.1,null,0.07)},
+    mismatch:function(){tone(330,0.11,'sine',0.09,220)},
+    eat:function(){tone(680,0.07,'square',0.06,1020)},
+    mark:function(){tone(1560,0.028,'sine',0.055)},
+    boom:function(){sweep(0.45,0.19,1000,80);tone(68,0.45,'sine',0.15,38)},
+    shoot:function(){tone(1500,0.08,'square',0.04,400);sweep(0.06,0.026,2600,900)},
+    hit:function(){tone(320,0.09,'square',0.055,120)},
+    win:function(){var n=[523,659,784,1046];for(var i=0;i<n.length;i++)tone(n[i],0.32,'sine',0.12,null,i*0.085)},
+    lose:function(){var n=[392,330,262,196];for(var i=0;i<n.length;i++)tone(n[i],0.26,'triangle',0.095,null,i*0.1)},
     setMuted:function(v){muted=!!v;if(master)master.gain.value=muted?0:0.24;
       try{localStorage.setItem('psweb_mute',muted?'1':'0')}catch(e){}},
     isMuted:function(){return muted}
@@ -373,6 +390,13 @@ var PS_SFX=(function(){
   function openPS(){if(!psm)return;psm.classList.add('on');PS_SFX.open();if(window.PS_PAUSE)window.PS_PAUSE(true)}
   function closePS(){if(!psm)return;psm.classList.remove('on');PS_SFX.close();if(window.PS_PAUSE)window.PS_PAUSE(false)}
   function paused(){return psm&&psm.classList.contains('on')}
+  function syncMute(){
+    var m=PS_SFX.isMuted(),t=document.getElementById('psmMuteT'),b=document.getElementById('psmMute');
+    if(t)t.textContent=m?'已静音':'静音';
+    if(b)b.classList.toggle('on',m);
+    document.body.classList.toggle('muted',m);
+  }
+  syncMute();
   var pb=document.getElementById('psbtn');if(pb)pb.onclick=function(){paused()?closePS():openPS()};
   if(psm){
     psm.onclick=function(e){if(e.target===psm)closePS()};
@@ -384,7 +408,7 @@ var PS_SFX=(function(){
         else if(a==='home'){flush();location.href='../'}
         else if(a==='quit'){flush();location.href='../'}
         else if(a==='full'){if(!document.fullscreenElement){document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen()}else{document.exitFullscreen&&document.exitFullscreen()}}
-        else if(a==='mute'){document.body.classList.toggle('muted')}
+        else if(a==='mute'){PS_SFX.setMuted(!PS_SFX.isMuted());syncMute();PS_SFX.tap()}
       };
     });
   }
@@ -437,13 +461,13 @@ function render(){var mb=document.getElementById('mb');mb.innerHTML='';mb.style.
 function startTimer(){if(!timer)timer=setInterval(function(){t++;document.getElementById('time').textContent=t},1000)}
 function click(i,j,e){if(over)return;if(mark){mark=false;return}var c=g[i][j];if(c.f||c.o)return;
  if(c.m){c.o=true;render();lose();return}open(i,j);startTimer();
- if(opened===R*C-M){over=true;clearInterval(timer);document.getElementById('ovt').textContent='排雷成功！';
+ if(opened===R*C-M){over=true;clearInterval(timer);PS_SFX.win();document.getElementById('ovt').textContent='排雷成功！';
   document.getElementById('ovp').textContent='用时 '+t+' 秒';document.getElementById('ov').hidden=false}}
 function open(i,j){var st=[[i,j]];while(st.length){var p=st.pop(),x=p[0],y=p[1],c=g[x][y];if(c.o||c.f)continue;c.o=true;opened++;
  if(c.n===0)for(var a=-1;a<=1;a++)for(var b=-1;b<=1;b++){var nx=x+a,ny=y+b;if((a||b)&&nx>=0&&nx<R&&ny>=0&&ny<C&&!g[nx][ny].o&&!g[nx][ny].m)st.push([nx,ny])}}
- render()}
-function flag(i,j){if(over)return;var c=g[i][j];if(c.o)return;c.f=!c.f;flags+=c.f?1:-1;document.getElementById('left').textContent=M-flags;render()}
-function lose(){over=true;clearInterval(timer);for(var i=0;i<R;i++)for(var j=0;j<C;j++)if(g[i][j].m)g[i][j].o=true;render();
+ render();PS_SFX.flip()}
+function flag(i,j){if(over)return;var c=g[i][j];if(c.o)return;c.f=!c.f;PS_SFX.mark();flags+=c.f?1:-1;document.getElementById('left').textContent=M-flags;render()}
+function lose(){over=true;clearInterval(timer);PS_SFX.boom();for(var i=0;i<R;i++)for(var j=0;j<C;j++)if(g[i][j].m)g[i][j].o=true;render();
  document.getElementById('ovp').textContent='坚持了 '+t+' 秒';document.getElementById('ov').hidden=false}
 function toggleMode(){mark=!mark;document.getElementById('modeBtn').textContent=mark?'点击标旗(开)':'右键标旗'}
 reset();

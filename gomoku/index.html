@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>五子棋 · PlayStation web</title>
-<meta name="theme-color" content="#060608">
-<meta name="description" content="五子棋 — PlayStation web 独立游戏页，打开即玩，成绩自动保存在本机。">
+<meta name="theme-color" content="#05060a">
+<meta name="description" content="五子棋 — PlayStation web 独立游戏，打开即玩，成绩自动保存在本机。">
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <style>
 :root{--accent:#ff9500}
@@ -168,43 +168,82 @@ main.stage{position:relative;z-index:1}
 }
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 
+/* ============ 全屏沉浸式游戏页 ============ */
+html,body{height:100%}
+body.gpage{background:#05060a;overflow:hidden;height:100dvh;max-height:100dvh}
+.gpage .gwall{position:fixed;inset:0;z-index:0;opacity:.42;filter:blur(3px) saturate(.92);
+ transform:scale(1.04);animation:gwallIn 1400ms var(--ease) both}
+@keyframes gwallIn{from{opacity:0}to{opacity:.42}}
+.gveil{position:fixed;inset:0;z-index:0;
+ background:radial-gradient(118% 86% at 50% 46%,rgba(4,5,10,.32) 0%,rgba(3,3,6,.82) 62%,rgba(2,2,4,.96) 100%)}
+.stage.gstage{position:relative;z-index:1;max-width:none;width:100%;margin:0;
+ padding:clamp(46px,7vh,74px) 16px clamp(30px,5vh,54px);
+ display:flex;flex-direction:column;align-items:center;justify-content:center;
+ min-height:100dvh;gap:clamp(10px,2.2vh,20px);animation:gstageIn 560ms var(--ease2) both}
+@keyframes gstageIn{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:none}}
+/* 游戏容器：全屏下不再有玻璃卡片感 */
+.gstage .panel{background:none;border:none;border-radius:0;box-shadow:none;backdrop-filter:none;
+ -webkit-backdrop-filter:none;padding:0;display:flex;flex-direction:column;align-items:center;
+ max-width:100%;max-height:100%}
+/* HUD：极简浮层，右上角 */
+.hud{position:fixed;top:clamp(12px,2vh,20px);right:clamp(14px,2vw,26px);z-index:6;
+ display:flex;gap:clamp(12px,2vw,22px);justify-content:flex-end;flex-wrap:wrap;
+ margin:0;padding:0;pointer-events:none}
+.hud .cell{background:none;border:none;border-radius:0;padding:0;min-width:0;text-align:right;
+ backdrop-filter:none;-webkit-backdrop-filter:none}
+.hud .cell .k{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.34);font-weight:600}
+.hud .cell .v{font-size:clamp(15px,1.6vw,19px);font-weight:600;margin-top:2px;color:#fff;letter-spacing:-.01em}
+.msg{position:fixed;left:50%;top:clamp(56px,9vh,86px);transform:translateX(-50%);z-index:7;
+ margin:0;min-height:0;padding:6px 14px;border-radius:999px;font-size:12.5px;
+ background:rgba(10,12,18,.72);border:1px solid rgba(255,255,255,.1);color:#d7e6ff;
+ backdrop-filter:blur(10px);opacity:0;transition:opacity 260ms var(--ease);pointer-events:none;white-space:nowrap}
+.msg:not(:empty){opacity:1}
+.controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:0;
+ opacity:.9;transition:opacity 260ms var(--ease)}
+.controls:hover{opacity:1}
+.controls .btn{padding:9px 20px;font-size:12.5px;background:rgba(255,255,255,.09);
+ border-color:rgba(255,255,255,.16);box-shadow:none;backdrop-filter:blur(10px);color:#eef4ff}
+.controls .btn:hover{background:rgba(255,255,255,.16);transform:none}
+/* 底部角落提示：几秒后自动淡出 */
+.ghint{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:5;
+ font-size:11px;letter-spacing:.1em;color:rgba(255,255,255,.34);pointer-events:none;
+ opacity:0;transition:opacity 900ms var(--ease)}
+.ghint.on{opacity:1}
+.ghint b{font-size:10px;letter-spacing:.06em;padding:1px 6px;border-radius:4px;
+ border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);font-weight:600}
+/* 全屏画布：按视口撑满，保持比例 */
+.gstage canvas{max-width:min(94vw,860px);max-height:calc(100dvh - 210px);width:auto;height:auto}
+@media(max-width:820px){
+  .hud{top:10px;right:12px;gap:12px}
+  .hud .cell .k{font-size:8.5px;letter-spacing:.12em}
+  .hud .cell .v{font-size:15px}
+  .msg{top:52px;font-size:11.5px;padding:5px 12px}
+  .stage.gstage{padding:54px 12px 26px;gap:10px}
+  .gstage canvas{max-height:calc(100dvh - 250px)}
+}
+@media(max-height:520px){
+  .hud .cell .k{display:none}
+  .stage.gstage{padding-top:38px}
+  .ghint{display:none}
+}
 
-.gm{background:#e8c98f;border-radius:12px;position:relative;width:min(390px,92vw);aspect-ratio:1;margin:0 auto;
-box-shadow:inset 0 0 30px rgba(0,0,0,.1)}
+
+.gm{background:linear-gradient(160deg,#e2c088,#d4b075);border-radius:14px;position:relative;width:min(540px,82vmin);aspect-ratio:1;margin:0 auto;
+box-shadow:0 40px 96px -44px rgba(0,0,0,.95),inset 0 0 40px rgba(120,80,20,.22)}
 .gm canvas{width:100%;height:100%;display:block;cursor:crosshair}
 
 </style>
 </head>
 <body class="gpage">
 <div class="gwall"><svg class="wp-art" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect x="305" y="-115" width="1310" height="1310" fill="255,149,0" opacity=".05" rx="6"/><path d="M384 -36V1116" stroke="#fff" stroke-width="2.6" opacity=".24"/><path d="M384 -36H1536" stroke="#fff" stroke-width="2.6" opacity=".24"/><path d="M528 -36V1116" stroke="#fff" stroke-width="2.6" opacity=".24"/><path d="M384 108H1536" stroke="#fff" stroke-width="2.6" opacity=".24"/><path d="M672 -36V1116" stroke="#fff" stroke-width="2.6" opacity=".24"/><path d="M384 252H1536" stroke="#fff" stroke-width="2.6" opacity=".24"/><path d="M816 -36V1116" stroke="#fff" stroke-width="2.6" opacity=".24"/><path d="M384 396H1536" stroke="#fff" stroke-width="2.6" opacity=".24"/><path d="M960 -36V1116" stroke="#fff" stroke-width="2.6" opacity=".24"/><path d="M384 540H1536" stroke="#fff" stroke-width="2.6" opacity=".24"/><path d="M1104 -36V1116" stroke="#fff" stroke-width="2.6" opacity=".24"/><path d="M384 684H1536" stroke="#fff" stroke-width="2.6" opacity=".24"/><path d="M1248 -36V1116" stroke="#fff" stroke-width="2.6" opacity=".24"/><path d="M384 828H1536" stroke="#fff" stroke-width="2.6" opacity=".24"/><path d="M1392 -36V1116" stroke="#fff" stroke-width="2.6" opacity=".24"/><path d="M384 972H1536" stroke="#fff" stroke-width="2.6" opacity=".24"/><path d="M1536 -36V1116" stroke="#fff" stroke-width="2.6" opacity=".24"/><path d="M384 1116H1536" stroke="#fff" stroke-width="2.6" opacity=".24"/><circle cx="672" cy="252" r="56" fill="#111114"/><circle cx="672" cy="252" r="56" fill="none" stroke="#fff" stroke-width="2.5" opacity=".26"/><circle cx="654" cy="234" r="20" fill="#fff" opacity=".07"/><circle cx="816" cy="396" r="56" fill="#111114"/><circle cx="816" cy="396" r="56" fill="none" stroke="#fff" stroke-width="2.5" opacity=".26"/><circle cx="798" cy="378" r="20" fill="#fff" opacity=".07"/><circle cx="960" cy="252" r="56" fill="#111114"/><circle cx="960" cy="252" r="56" fill="none" stroke="#fff" stroke-width="2.5" opacity=".26"/><circle cx="942" cy="234" r="20" fill="#fff" opacity=".07"/><circle cx="528" cy="540" r="56" fill="#111114"/><circle cx="528" cy="540" r="56" fill="none" stroke="#fff" stroke-width="2.5" opacity=".26"/><circle cx="510" cy="522" r="20" fill="#fff" opacity=".07"/><circle cx="1104" cy="684" r="56" fill="#111114"/><circle cx="1104" cy="684" r="56" fill="none" stroke="#fff" stroke-width="2.5" opacity=".26"/><circle cx="1086" cy="666" r="20" fill="#fff" opacity=".07"/><circle cx="816" cy="828" r="56" fill="#111114"/><circle cx="816" cy="828" r="56" fill="none" stroke="#fff" stroke-width="2.5" opacity=".26"/><circle cx="798" cy="810" r="20" fill="#fff" opacity=".07"/><circle cx="1248" cy="540" r="56" fill="#111114"/><circle cx="1248" cy="540" r="56" fill="none" stroke="#fff" stroke-width="2.5" opacity=".26"/><circle cx="1230" cy="522" r="20" fill="#fff" opacity=".07"/><circle cx="672" cy="396" r="86" fill="255,149,0" opacity=".13"/><circle cx="672" cy="396" r="56" fill="#f6f7fb"/><circle cx="654" cy="376" r="18" fill="#fff" opacity=".9"/><circle cx="816" cy="540" r="86" fill="255,149,0" opacity=".13"/><circle cx="816" cy="540" r="56" fill="#f6f7fb"/><circle cx="798" cy="520" r="18" fill="#fff" opacity=".9"/><circle cx="960" cy="540" r="86" fill="255,149,0" opacity=".13"/><circle cx="960" cy="540" r="56" fill="#f6f7fb"/><circle cx="942" cy="520" r="18" fill="#fff" opacity=".9"/><circle cx="960" cy="684" r="86" fill="255,149,0" opacity=".13"/><circle cx="960" cy="684" r="56" fill="#f6f7fb"/><circle cx="942" cy="664" r="18" fill="#fff" opacity=".9"/><circle cx="1104" cy="828" r="86" fill="255,149,0" opacity=".13"/><circle cx="1104" cy="828" r="56" fill="#f6f7fb"/><circle cx="1086" cy="808" r="18" fill="#fff" opacity=".9"/><path d="M672 396L1248 972" stroke="255,149,0" stroke-width="9" stroke-linecap="round" opacity=".5"/></svg></div>
-<header class="gtop">
-  <a class="gback" href="../" title="返回主页"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></a>
-  <span class="gname">五子棋<i>棋类</i></span>
-  <span class="spacer"></span>
-  <span class="guser"><span class="av" id="gAvatar"></span><span id="gUser">访客</span></span>
-  <button class="gps" id="psbtn" title="控制中心（Esc）"><span>PS</span></button>
-</header>
-<section class="ghero">
-  <a class="ghero-cover" href="../" title="返回主页"><span class="gcover-in"><svg class="ka-art" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect x="305" y="-115" width="1310" height="1310" fill="255,149,0" opacity=".05" rx="6"/><path d="M384 -36V1116" stroke="#fff" stroke-width="2.6" opacity=".24"/><path d="M384 -36H1536" stroke="#fff" stroke-width="2.6" opacity=".24"/><path d="M528 -36V1116" stroke="#fff" stroke-width="2.6" opacity=".24"/><path d="M384 108H1536" stroke="#fff" stroke-width="2.6" opacity=".24"/><path d="M672 -36V1116" stroke="#fff" stroke-width="2.6" opacity=".24"/><path d="M384 252H1536" stroke="#fff" stroke-width="2.6" opacity=".24"/><path d="M816 -36V1116" stroke="#fff" stroke-width="2.6" opacity=".24"/><path d="M384 396H1536" stroke="#fff" stroke-width="2.6" opacity=".24"/><path d="M960 -36V1116" stroke="#fff" stroke-width="2.6" opacity=".24"/><path d="M384 540H1536" stroke="#fff" stroke-width="2.6" opacity=".24"/><path d="M1104 -36V1116" stroke="#fff" stroke-width="2.6" opacity=".24"/><path d="M384 684H1536" stroke="#fff" stroke-width="2.6" opacity=".24"/><path d="M1248 -36V1116" stroke="#fff" stroke-width="2.6" opacity=".24"/><path d="M384 828H1536" stroke="#fff" stroke-width="2.6" opacity=".24"/><path d="M1392 -36V1116" stroke="#fff" stroke-width="2.6" opacity=".24"/><path d="M384 972H1536" stroke="#fff" stroke-width="2.6" opacity=".24"/><path d="M1536 -36V1116" stroke="#fff" stroke-width="2.6" opacity=".24"/><path d="M384 1116H1536" stroke="#fff" stroke-width="2.6" opacity=".24"/><circle cx="672" cy="252" r="56" fill="#111114"/><circle cx="672" cy="252" r="56" fill="none" stroke="#fff" stroke-width="2.5" opacity=".26"/><circle cx="654" cy="234" r="20" fill="#fff" opacity=".07"/><circle cx="816" cy="396" r="56" fill="#111114"/><circle cx="816" cy="396" r="56" fill="none" stroke="#fff" stroke-width="2.5" opacity=".26"/><circle cx="798" cy="378" r="20" fill="#fff" opacity=".07"/><circle cx="960" cy="252" r="56" fill="#111114"/><circle cx="960" cy="252" r="56" fill="none" stroke="#fff" stroke-width="2.5" opacity=".26"/><circle cx="942" cy="234" r="20" fill="#fff" opacity=".07"/><circle cx="528" cy="540" r="56" fill="#111114"/><circle cx="528" cy="540" r="56" fill="none" stroke="#fff" stroke-width="2.5" opacity=".26"/><circle cx="510" cy="522" r="20" fill="#fff" opacity=".07"/><circle cx="1104" cy="684" r="56" fill="#111114"/><circle cx="1104" cy="684" r="56" fill="none" stroke="#fff" stroke-width="2.5" opacity=".26"/><circle cx="1086" cy="666" r="20" fill="#fff" opacity=".07"/><circle cx="816" cy="828" r="56" fill="#111114"/><circle cx="816" cy="828" r="56" fill="none" stroke="#fff" stroke-width="2.5" opacity=".26"/><circle cx="798" cy="810" r="20" fill="#fff" opacity=".07"/><circle cx="1248" cy="540" r="56" fill="#111114"/><circle cx="1248" cy="540" r="56" fill="none" stroke="#fff" stroke-width="2.5" opacity=".26"/><circle cx="1230" cy="522" r="20" fill="#fff" opacity=".07"/><circle cx="672" cy="396" r="86" fill="255,149,0" opacity=".13"/><circle cx="672" cy="396" r="56" fill="#f6f7fb"/><circle cx="654" cy="376" r="18" fill="#fff" opacity=".9"/><circle cx="816" cy="540" r="86" fill="255,149,0" opacity=".13"/><circle cx="816" cy="540" r="56" fill="#f6f7fb"/><circle cx="798" cy="520" r="18" fill="#fff" opacity=".9"/><circle cx="960" cy="540" r="86" fill="255,149,0" opacity=".13"/><circle cx="960" cy="540" r="56" fill="#f6f7fb"/><circle cx="942" cy="520" r="18" fill="#fff" opacity=".9"/><circle cx="960" cy="684" r="86" fill="255,149,0" opacity=".13"/><circle cx="960" cy="684" r="56" fill="#f6f7fb"/><circle cx="942" cy="664" r="18" fill="#fff" opacity=".9"/><circle cx="1104" cy="828" r="86" fill="255,149,0" opacity=".13"/><circle cx="1104" cy="828" r="56" fill="#f6f7fb"/><circle cx="1086" cy="808" r="18" fill="#fff" opacity=".9"/><path d="M672 396L1248 972" stroke="255,149,0" stroke-width="9" stroke-linecap="round" opacity=".5"/></svg></span>
-    <span class="gcover-play"><svg viewBox="0 0 24 24"><path d="M8 5l11 7-11 7V5z" fill="currentColor"/></svg></span></a>
-  <div class="ghero-txt">
-    <span class="ghero-cat">棋类 · PlayStation web</span>
-    <h1>五子棋</h1>
-    <p>十五路棋盘，五子连珠定胜负。</p>
-    <div class="ghero-meta">
-      <span>最高纪录 <b id="gBest">—</b></span>
-      <span>游玩时长 <b id="gTime">—</b></span>
-      <span>1 人 · 对战电脑</span>
-    </div>
-  </div>
-</section>
-<main class="stage gstage">
+<div class="gveil"></div>
 <div class="hud"><div class="cell"><div class="k">对手</div><div class="v" style="font-size:15px">电脑 AI</div></div><div class="cell"><div class="k">你执</div><div class="v" style="font-size:15px">黑 ●</div></div></div>
+<main class="stage gstage">
 <div class="panel"><div class="gm"><canvas id="cv" width="390" height="390"></canvas></div></div>
 <div class="msg" id="msg"></div>
 <div class="controls"><button class="btn" onclick="start()">重新开局</button></div>
-<p class="tips">点击交叉点落子，先连成五子者胜。你执黑先手，AI 执白。</p>
 </main>
+<div class="ghint" id="ghint"><b>Esc</b> 控制中心</div>
 <div class="overlay" id="ov" hidden><div class="box"><h2 id="ovt"></h2><p id="ovp"></p><button class="btn" onclick="start();document.getElementById('ov').hidden=true">再来一局</button></div></div>
 <div class="psm" id="psmenu">
  <div class="psm-panel">
@@ -271,6 +310,34 @@ function PS_setUser(u){
   return u;
 }
 function PS_clearUser(){try{localStorage.removeItem('psweb_uid')}catch(e){}}
+/* ---- 会员与密钥 ---- */
+var PS_KA='23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+function PS_khash(s){var h=0x9e3779b1;for(var i=0;i<s.length;i++){h=(h*33+PS_KA.indexOf(s[i]))&0x7fffffff}return h}
+function PS_kmake(s1){var h=PS_khash(s1),o='';for(var i=0;i<5;i++){o+=PS_KA[h%32];h=Math.floor(h/32)+7}return o}
+function PS_keyValid(raw){
+  var k=String(raw||'').toUpperCase().replace(/[^0-9A-Z]/g,'');
+  if(k.indexOf('PSWB')===0)k=k.slice(4);
+  if(k.length!==10)return false;
+  for(var i=0;i<10;i++){if(PS_KA.indexOf(k[i])<0)return false}
+  return PS_kmake(k.slice(0,5))===k.slice(5);
+}
+function PS_vip(){try{return localStorage.getItem('psweb_vip')==='1'}catch(e){return false}}
+function PS_setVip(on){try{localStorage.setItem('psweb_vip',on?'1':'0')}catch(e){}}
+function PS_unlockWithKey(raw){
+  if(!PS_keyValid(raw))return false;
+  PS_setVip(true);
+  var u=PS_getUser();
+  if(u){u.vip=true;PS_setUser(u)}
+  return true;
+}
+/* 访客账户：设备无会员时唯一可用账户 */
+function PS_ensureGuest(){
+  var a=PS_users();
+  if(a.length)return a;
+  var g={id:'guest',name:'访客',avatar:7,created:0,vip:false,guest:true};
+  PS_saveUsers([g]);PS_setUid('guest');
+  return [g];
+}
 
 
 /* ---- PS5 系统音效（Web Audio 合成，无外部素材） ---- */
@@ -427,6 +494,14 @@ var PS_SFX=(function(){
 })();
 /* 进场 */
 requestAnimationFrame(function(){document.body.classList.add('ready')});
+/* 底部 Esc 提示：淡入后自动淡出，首次按键即隐藏 */
+(function(){
+  var g=document.getElementById('ghint');if(!g)return;
+  setTimeout(function(){g.classList.add('on')},1400);
+  setTimeout(function(){g.classList.remove('on')},7200);
+  document.addEventListener('keydown',function(){g.classList.remove('on')},{once:true});
+  document.addEventListener('pointerdown',function(){g.classList.remove('on')},{once:true});
+})();
 
 
 function hiGet(k){try{return +(localStorage.getItem('gc_'+k)||0)}catch(e){return 0}}
@@ -436,7 +511,8 @@ function setMsg(t){var m=document.getElementById('msg');if(m)m.textContent=t||''
 
 var N=13,cv=document.getElementById('cv'),ctx=cv.getContext('2d'),cell=cv.width/(N+1),b,turn,over;
 function start(){b=Array.from({length:N},()=>Array(N).fill(0));turn=1;over=false;document.getElementById('ov').hidden=true;setMsg('你先手');draw()}
-function draw(){ctx.fillStyle='#e8c98f';ctx.fillRect(0,0,cv.width,cv.height);
+function draw(){var gd=ctx.createLinearGradient(0,0,cv.width,cv.height);gd.addColorStop(0,'#e7c893');gd.addColorStop(1,'#d0ab6f');
+ ctx.fillStyle=gd;ctx.fillRect(0,0,cv.width,cv.height);
  ctx.strokeStyle='#7a5a2e';ctx.lineWidth=1;for(var i=0;i<N;i++){ctx.beginPath();ctx.moveTo(cell,(i+1)*cell);ctx.lineTo(N*cell,(i+1)*cell);ctx.stroke();
  ctx.beginPath();ctx.moveTo((i+1)*cell,cell);ctx.lineTo((i+1)*cell,N*cell);ctx.stroke()}
  for(var i=0;i<N;i++)for(var j=0;j<N;j++)if(b[i][j]){var x=(j+1)*cell,y=(i+1)*cell;

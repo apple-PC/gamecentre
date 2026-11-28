@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>贪吃蛇 · PlayStation web</title>
-<meta name="theme-color" content="#060608">
-<meta name="description" content="贪吃蛇 — PlayStation web 独立游戏页，打开即玩，成绩自动保存在本机。">
+<meta name="theme-color" content="#05060a">
+<meta name="description" content="贪吃蛇 — PlayStation web 独立游戏，打开即玩，成绩自动保存在本机。">
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <style>
 :root{--accent:#34c759}
@@ -168,8 +168,68 @@ main.stage{position:relative;z-index:1}
 }
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 
+/* ============ 全屏沉浸式游戏页 ============ */
+html,body{height:100%}
+body.gpage{background:#05060a;overflow:hidden;height:100dvh;max-height:100dvh}
+.gpage .gwall{position:fixed;inset:0;z-index:0;opacity:.42;filter:blur(3px) saturate(.92);
+ transform:scale(1.04);animation:gwallIn 1400ms var(--ease) both}
+@keyframes gwallIn{from{opacity:0}to{opacity:.42}}
+.gveil{position:fixed;inset:0;z-index:0;
+ background:radial-gradient(118% 86% at 50% 46%,rgba(4,5,10,.32) 0%,rgba(3,3,6,.82) 62%,rgba(2,2,4,.96) 100%)}
+.stage.gstage{position:relative;z-index:1;max-width:none;width:100%;margin:0;
+ padding:clamp(46px,7vh,74px) 16px clamp(30px,5vh,54px);
+ display:flex;flex-direction:column;align-items:center;justify-content:center;
+ min-height:100dvh;gap:clamp(10px,2.2vh,20px);animation:gstageIn 560ms var(--ease2) both}
+@keyframes gstageIn{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:none}}
+/* 游戏容器：全屏下不再有玻璃卡片感 */
+.gstage .panel{background:none;border:none;border-radius:0;box-shadow:none;backdrop-filter:none;
+ -webkit-backdrop-filter:none;padding:0;display:flex;flex-direction:column;align-items:center;
+ max-width:100%;max-height:100%}
+/* HUD：极简浮层，右上角 */
+.hud{position:fixed;top:clamp(12px,2vh,20px);right:clamp(14px,2vw,26px);z-index:6;
+ display:flex;gap:clamp(12px,2vw,22px);justify-content:flex-end;flex-wrap:wrap;
+ margin:0;padding:0;pointer-events:none}
+.hud .cell{background:none;border:none;border-radius:0;padding:0;min-width:0;text-align:right;
+ backdrop-filter:none;-webkit-backdrop-filter:none}
+.hud .cell .k{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.34);font-weight:600}
+.hud .cell .v{font-size:clamp(15px,1.6vw,19px);font-weight:600;margin-top:2px;color:#fff;letter-spacing:-.01em}
+.msg{position:fixed;left:50%;top:clamp(56px,9vh,86px);transform:translateX(-50%);z-index:7;
+ margin:0;min-height:0;padding:6px 14px;border-radius:999px;font-size:12.5px;
+ background:rgba(10,12,18,.72);border:1px solid rgba(255,255,255,.1);color:#d7e6ff;
+ backdrop-filter:blur(10px);opacity:0;transition:opacity 260ms var(--ease);pointer-events:none;white-space:nowrap}
+.msg:not(:empty){opacity:1}
+.controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:0;
+ opacity:.9;transition:opacity 260ms var(--ease)}
+.controls:hover{opacity:1}
+.controls .btn{padding:9px 20px;font-size:12.5px;background:rgba(255,255,255,.09);
+ border-color:rgba(255,255,255,.16);box-shadow:none;backdrop-filter:blur(10px);color:#eef4ff}
+.controls .btn:hover{background:rgba(255,255,255,.16);transform:none}
+/* 底部角落提示：几秒后自动淡出 */
+.ghint{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:5;
+ font-size:11px;letter-spacing:.1em;color:rgba(255,255,255,.34);pointer-events:none;
+ opacity:0;transition:opacity 900ms var(--ease)}
+.ghint.on{opacity:1}
+.ghint b{font-size:10px;letter-spacing:.06em;padding:1px 6px;border-radius:4px;
+ border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);font-weight:600}
+/* 全屏画布：按视口撑满，保持比例 */
+.gstage canvas{max-width:min(94vw,860px);max-height:calc(100dvh - 210px);width:auto;height:auto}
+@media(max-width:820px){
+  .hud{top:10px;right:12px;gap:12px}
+  .hud .cell .k{font-size:8.5px;letter-spacing:.12em}
+  .hud .cell .v{font-size:15px}
+  .msg{top:52px;font-size:11.5px;padding:5px 12px}
+  .stage.gstage{padding:54px 12px 26px;gap:10px}
+  .gstage canvas{max-height:calc(100dvh - 250px)}
+}
+@media(max-height:520px){
+  .hud .cell .k{display:none}
+  .stage.gstage{padding-top:38px}
+  .ghint{display:none}
+}
 
-canvas{display:block;margin:0 auto;background:#f0f0f3;border-radius:14px;touch-action:none;max-width:100%}
+
+canvas{display:block;margin:0 auto;background:#0a0c11;border:1px solid rgba(255,255,255,.07);border-radius:16px;touch-action:none;max-width:100%;
+ box-shadow:0 34px 90px -40px rgba(0,0,0,.95),inset 0 0 60px rgba(52,199,89,.05)}
 .dpad{display:none;grid-template-columns:repeat(3,56px);grid-template-rows:repeat(2,56px);gap:6px;justify-content:center;margin-top:16px}
 .dpad button{border:none;border-radius:12px;background:rgba(88,126,205,.30);color:var(--ink);font-size:20px;font-weight:700}
 .dpad .u{grid-column:2}.dpad .l{grid-column:1;grid-row:2}.dpad .d{grid-column:2;grid-row:2}.dpad .r{grid-column:3;grid-row:2}
@@ -179,34 +239,14 @@ canvas{display:block;margin:0 auto;background:#f0f0f3;border-radius:14px;touch-a
 </head>
 <body class="gpage">
 <div class="gwall"><svg class="wp-art" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><g opacity=".5"><path d="M0 90h1920" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M0 180h1920" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M0 270h1920" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M0 360h1920" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M0 450h1920" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M0 540h1920" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M0 630h1920" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M0 720h1920" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M0 810h1920" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M0 900h1920" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M0 990h1920" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M90 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M180 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M270 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M360 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M450 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M540 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M630 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M720 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M810 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M900 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M990 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M1080 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M1170 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M1260 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M1350 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M1440 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M1530 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M1620 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M1710 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M1800 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M1890 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/></g><path d="M300 900 H660 V690 H1160 V470 H1580 V250 H2000" fill="none" stroke="52,199,89" stroke-width="210" stroke-linecap="round" stroke-linejoin="round" opacity=".12"/><path d="M300 900 H660 V690 H1160 V470 H1580 V250 H2000" fill="none" stroke="rgba(52,199,89,0.95)" stroke-width="118" stroke-linecap="round" stroke-linejoin="round"/><path d="M300 900 H660 V690 H1160 V470 H1580 V250 H2000" fill="none" stroke="#fff" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" opacity=".16"/><circle cx="300" cy="900" r="84" fill="rgba(52,199,89,1)"/><circle cx="272" cy="872" r="15" fill="#fff" opacity=".95"/><circle cx="322" cy="872" r="15" fill="#fff" opacity=".95"/><circle cx="272" cy="872" r="6" fill="#0a1a10"/><circle cx="322" cy="872" r="6" fill="#0a1a10"/><circle cx="1770" cy="250" r="60" fill="#fff" opacity=".10"/><circle cx="1770" cy="250" r="26" fill="rgba(52,199,89,1)"/><circle cx="1460" cy="700" r="15" fill="#fff" opacity=".26"/><circle cx="700" cy="330" r="11" fill="#fff" opacity=".2"/><circle cx="1120" cy="880" r="9" fill="#fff" opacity=".16"/></svg></div>
-<header class="gtop">
-  <a class="gback" href="../" title="返回主页"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></a>
-  <span class="gname">贪吃蛇<i>街机</i></span>
-  <span class="spacer"></span>
-  <span class="guser"><span class="av" id="gAvatar"></span><span id="gUser">访客</span></span>
-  <button class="gps" id="psbtn" title="控制中心（Esc）"><span>PS</span></button>
-</header>
-<section class="ghero">
-  <a class="ghero-cover" href="../" title="返回主页"><span class="gcover-in"><svg class="ka-art" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><g opacity=".5"><path d="M0 90h1920" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M0 180h1920" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M0 270h1920" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M0 360h1920" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M0 450h1920" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M0 540h1920" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M0 630h1920" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M0 720h1920" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M0 810h1920" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M0 900h1920" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M0 990h1920" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M90 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M180 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M270 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M360 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M450 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M540 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M630 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M720 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M810 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M900 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M990 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M1080 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M1170 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M1260 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M1350 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M1440 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M1530 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M1620 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M1710 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M1800 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/><path d="M1890 0v1080" stroke="#fff" stroke-width="1" opacity=".045"/></g><path d="M300 900 H660 V690 H1160 V470 H1580 V250 H2000" fill="none" stroke="52,199,89" stroke-width="210" stroke-linecap="round" stroke-linejoin="round" opacity=".12"/><path d="M300 900 H660 V690 H1160 V470 H1580 V250 H2000" fill="none" stroke="rgba(52,199,89,0.95)" stroke-width="118" stroke-linecap="round" stroke-linejoin="round"/><path d="M300 900 H660 V690 H1160 V470 H1580 V250 H2000" fill="none" stroke="#fff" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" opacity=".16"/><circle cx="300" cy="900" r="84" fill="rgba(52,199,89,1)"/><circle cx="272" cy="872" r="15" fill="#fff" opacity=".95"/><circle cx="322" cy="872" r="15" fill="#fff" opacity=".95"/><circle cx="272" cy="872" r="6" fill="#0a1a10"/><circle cx="322" cy="872" r="6" fill="#0a1a10"/><circle cx="1770" cy="250" r="60" fill="#fff" opacity=".10"/><circle cx="1770" cy="250" r="26" fill="rgba(52,199,89,1)"/><circle cx="1460" cy="700" r="15" fill="#fff" opacity=".26"/><circle cx="700" cy="330" r="11" fill="#fff" opacity=".2"/><circle cx="1120" cy="880" r="9" fill="#fff" opacity=".16"/></svg></span>
-    <span class="gcover-play"><svg viewBox="0 0 24 24"><path d="M8 5l11 7-11 7V5z" fill="currentColor"/></svg></span></a>
-  <div class="ghero-txt">
-    <span class="ghero-cat">街机 · PlayStation web</span>
-    <h1>贪吃蛇</h1>
-    <p>吞下果实，越来越长，别咬到自己。</p>
-    <div class="ghero-meta">
-      <span>最高纪录 <b id="gBest">—</b></span>
-      <span>游玩时长 <b id="gTime">—</b></span>
-      <span>1 人</span>
-    </div>
-  </div>
-</section>
-<main class="stage gstage">
+<div class="gveil"></div>
 <div class="hud"><div class="cell"><div class="k">得分</div><div class="v" id="score">0</div></div><div class="cell"><div class="k">最高</div><div class="v" id="best">0</div></div></div>
+<main class="stage gstage">
 <div class="panel"><canvas id="cv" width="360" height="360"></canvas><div class="dpad"><button class="u" onclick="turn(0,-1)">↑</button><button class="l" onclick="turn(-1,0)">←</button><button class="d" onclick="turn(0,1)">↓</button><button class="r" onclick="turn(1,0)">→</button></div></div>
 <div class="msg" id="msg"></div>
 <div class="controls"><button class="btn" onclick="start()">开始 / 重来</button><button class="btn sec" onclick="togglePause()" id="pbtn">暂停</button></div>
-<p class="tips">方向键或 WASD 控制，手机用下方方向盘。别撞墙、别咬到自己。</p>
 </main>
+<div class="ghint" id="ghint"><b>Esc</b> 控制中心</div>
 <div class="overlay" id="ov" hidden><div class="box"><h2>撞到了！</h2><p id="ovp"></p><button class="btn" onclick="start();document.getElementById('ov').hidden=true">再来一局</button></div></div>
 <div class="psm" id="psmenu">
  <div class="psm-panel">
@@ -273,6 +313,34 @@ function PS_setUser(u){
   return u;
 }
 function PS_clearUser(){try{localStorage.removeItem('psweb_uid')}catch(e){}}
+/* ---- 会员与密钥 ---- */
+var PS_KA='23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+function PS_khash(s){var h=0x9e3779b1;for(var i=0;i<s.length;i++){h=(h*33+PS_KA.indexOf(s[i]))&0x7fffffff}return h}
+function PS_kmake(s1){var h=PS_khash(s1),o='';for(var i=0;i<5;i++){o+=PS_KA[h%32];h=Math.floor(h/32)+7}return o}
+function PS_keyValid(raw){
+  var k=String(raw||'').toUpperCase().replace(/[^0-9A-Z]/g,'');
+  if(k.indexOf('PSWB')===0)k=k.slice(4);
+  if(k.length!==10)return false;
+  for(var i=0;i<10;i++){if(PS_KA.indexOf(k[i])<0)return false}
+  return PS_kmake(k.slice(0,5))===k.slice(5);
+}
+function PS_vip(){try{return localStorage.getItem('psweb_vip')==='1'}catch(e){return false}}
+function PS_setVip(on){try{localStorage.setItem('psweb_vip',on?'1':'0')}catch(e){}}
+function PS_unlockWithKey(raw){
+  if(!PS_keyValid(raw))return false;
+  PS_setVip(true);
+  var u=PS_getUser();
+  if(u){u.vip=true;PS_setUser(u)}
+  return true;
+}
+/* 访客账户：设备无会员时唯一可用账户 */
+function PS_ensureGuest(){
+  var a=PS_users();
+  if(a.length)return a;
+  var g={id:'guest',name:'访客',avatar:7,created:0,vip:false,guest:true};
+  PS_saveUsers([g]);PS_setUid('guest');
+  return [g];
+}
 
 
 /* ---- PS5 系统音效（Web Audio 合成，无外部素材） ---- */
@@ -429,6 +497,14 @@ var PS_SFX=(function(){
 })();
 /* 进场 */
 requestAnimationFrame(function(){document.body.classList.add('ready')});
+/* 底部 Esc 提示：淡入后自动淡出，首次按键即隐藏 */
+(function(){
+  var g=document.getElementById('ghint');if(!g)return;
+  setTimeout(function(){g.classList.add('on')},1400);
+  setTimeout(function(){g.classList.remove('on')},7200);
+  document.addEventListener('keydown',function(){g.classList.remove('on')},{once:true});
+  document.addEventListener('pointerdown',function(){g.classList.remove('on')},{once:true});
+})();
 
 
 function hiGet(k){try{return +(localStorage.getItem('gc_'+k)||0)}catch(e){return 0}}
@@ -436,13 +512,19 @@ function hiSet(k,v){try{localStorage.setItem('gc_'+k,v)}catch(e){}}
 function setMsg(t){var m=document.getElementById('msg');if(m)m.textContent=t||''}
 
 
-var cv=document.getElementById('cv'),ctx=cv.getContext('2d'),N=18,cell=cv.width/N;
+var cv=document.getElementById('cv'),ctx=cv.getContext('2d'),N=18,cell=20;
+function fit(){var dpad=window.innerWidth<=520?152:0;
+ var s=Math.min(Math.round(window.innerWidth*.94),Math.round(window.innerHeight-230-dpad),720);
+ s=Math.max(270,s);cv.width=cv.height=Math.round(s/N)*N;cell=cv.width/N}
+fit();
 var snake,dir,food,score=0,best=hiGet('snake'),timer,run=false,pause=false;
-function start(){snake=[[7,9],[6,9],[5,9]];dir=[1,0];score=0;placeFood();run=true;pause=false;
+function start(){snake=[[7,9],[6,9],[5,9]];dir=[1,0];score=0;placeFood();run=false;pause=false;
  document.getElementById('score').textContent=0;document.getElementById('ov').hidden=true;
- document.getElementById('pbtn').textContent='暂停';clearInterval(timer);timer=setInterval(step,110);setMsg('')}
+ document.getElementById('pbtn').textContent='暂停';clearInterval(timer);timer=null;
+ draw();setMsg('按方向键或滑动开始')}
 function placeFood(){do{food=[Math.random()*N|0,Math.random()*N|0]}while(snake.some(function(s){return s[0]===food[0]&&s[1]===food[1]}))}
-function turn(x,y){if(x===-dir[0]&&y===-dir[1])return;dir=[x,y]}
+function turn(x,y){if(x===-dir[0]&&y===-dir[1])return;dir=[x,y];
+ if(!run){run=true;setMsg('');clearInterval(timer);timer=setInterval(step,110)}}
 function step(){if(!run||pause)return;var h=[snake[0][0]+dir[0],snake[0][1]+dir[1]];
  if(h[0]<0||h[0]>=N||h[1]<0||h[1]>=N||snake.some(function(s,i){return i<snake.length-1&&s[0]===h[0]&&s[1]===h[1]})){
   run=false;clearInterval(timer);PS_SFX.lose();document.getElementById('ovp').textContent='得分 '+score;document.getElementById('ov').hidden=false;return}
@@ -450,7 +532,7 @@ function step(){if(!run||pause)return;var h=[snake[0][0]+dir[0],snake[0][1]+dir[
   if(score>best){best=score;hiSet('snake',best);document.getElementById('best').textContent=best}placeFood()}else snake.pop();draw()}
 function draw(){ctx.clearRect(0,0,cv.width,cv.height);
  ctx.fillStyle='#ff5f57';ctx.beginPath();ctx.arc(food[0]*cell+cell/2,food[1]*cell+cell/2,cell*.36,0,7);ctx.fill();
- snake.forEach(function(s,i){ctx.fillStyle=i===0?'#1d1d1f':'#34c759';var r=i===0?6:5;
+ snake.forEach(function(s,i){ctx.fillStyle=i===0?'#9df5c3':'#34c759';var r=i===0?6:5;
  ctx.beginPath();ctx.roundRect(s[0]*cell+2,s[1]*cell+2,cell-4,cell-4,r);ctx.fill()})}
 function togglePause(){if(!run)return;pause=!pause;document.getElementById('pbtn').textContent=pause?'继续':'暂停';setMsg(pause?'已暂停':'')}
 var KM={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1],a:[-1,0],d:[1,0],w:[0,-1],s:[0,1],A:[-1,0],D:[1,0],W:[0,-1],S:[0,1]};
@@ -459,6 +541,7 @@ var sx=0,sy=0;cv.addEventListener('touchstart',function(e){sx=e.touches[0].clien
 cv.addEventListener('touchend',function(e){var dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;
  if(Math.abs(dx)>Math.abs(dy))turn(dx>0?1:-1,0);else turn(0,dy>0?1:-1)},{passive:true});
 document.getElementById('best').textContent=best;start();
+window.addEventListener('resize',function(){fit();if(snake&&food)draw()});
 
 </script>
 </body>

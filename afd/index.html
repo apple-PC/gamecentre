@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>支持作者 · PlayStation web</title>
+<meta name="theme-color" content="#08090c">
+<meta name="description" content="在爱发电支持 PlayStation web，获取会员密钥，解锁账户创建权。">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--ink:#f5f5f5;--ink2:#a8adb8;--ink3:#6c7280;--line:rgba(255,255,255,.1);
+ --ease:cubic-bezier(.32,.72,0,1);--ease2:cubic-bezier(.16,1,.3,1)}
+html,body{min-height:100%}
+body{background:#08090c;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",
+ "PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased;line-height:1.6}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+.wrap{max-width:760px;margin:0 auto;padding:26px 20px 80px}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:44px}
+.top svg.mark{width:96px;height:24px;opacity:.9}
+.top .brand{font-size:10px;letter-spacing:.2em;color:rgba(255,255,255,.42);font-weight:600;white-space:nowrap}
+.top .sp{flex:1}
+.back{display:inline-flex;align-items:center;gap:6px;font-size:12px;white-space:nowrap;flex:0 0 auto;color:rgba(255,255,255,.5);
+ padding:7px 13px;border-radius:999px;border:1px solid rgba(255,255,255,.12);transition:.22s var(--ease)}
+.back:hover{color:#fff;border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.05)}
+.back svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.kicker{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.36);font-weight:600}
+h1{font-size:clamp(28px,4.4vw,42px);font-weight:600;letter-spacing:-.03em;line-height:1.12;margin:10px 0 14px}
+.lead{font-size:14px;color:var(--ink2);max-width:56ch}
+.card{background:linear-gradient(165deg,rgba(24,26,32,.9),rgba(13,14,18,.94));border:1px solid var(--line);
+ border-radius:16px;padding:22px 24px;margin-top:22px;box-shadow:0 26px 70px -40px rgba(0,0,0,.9)}
+.h2{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.44);font-weight:600;margin-bottom:16px}
+.steps{display:flex;flex-direction:column;gap:16px}
+.step{display:flex;gap:14px;align-items:flex-start}
+.step .n{width:24px;height:24px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;
+ font-size:11.5px;font-weight:700;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.14);color:#fff}
+.step b{display:block;font-size:13.5px;font-weight:600;margin-bottom:3px}
+.step p{font-size:12.5px;color:var(--ink2)}
+.step code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;letter-spacing:.08em;
+ background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:5px;padding:1px 6px;color:#dbe6ff}
+.afd-go{display:inline-flex;align-items:center;gap:8px;margin-top:18px;background:linear-gradient(135deg,#ff9a4d,#ff6a1a);
+ color:#241004;font-weight:650;font-size:13.5px;padding:12px 22px;border-radius:12px;
+ transition:transform .22s var(--ease),filter .22s var(--ease);box-shadow:0 14px 34px -16px rgba(255,106,26,.8)}
+.afd-go:hover{transform:translateY(-1px);filter:brightness(1.06)}
+.afd-go svg{width:15px;height:15px;fill:currentColor}
+.keyrow{display:flex;gap:9px;flex-wrap:wrap}
+.keyrow input{flex:1;min-width:220px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);
+ border-radius:10px;padding:13px 15px;color:#fff;font-size:13.5px;letter-spacing:.16em;outline:none;
+ font-family:ui-monospace,SFMono-Regular,Menlo,monospace;text-transform:uppercase}
+.keyrow input:focus{border-color:rgba(255,255,255,.42);background:rgba(255,255,255,.07)}
+.keyrow input::placeholder{color:rgba(255,255,255,.24);letter-spacing:.1em}
+.btn{border-radius:10px;padding:12px 22px;font-size:13px;font-weight:600;letter-spacing:.01em;
+ background:linear-gradient(180deg,#1b8ae8,#0064b4);color:#fff;box-shadow:0 10px 26px -12px rgba(0,112,193,.9),
+ inset 0 1px 0 rgba(255,255,255,.2);transition:transform .2s var(--ease),filter .2s var(--ease)}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.07)}
+.tip{margin-top:12px;font-size:12px;line-height:1.7;color:var(--ink3);min-height:20px}
+.tip.err{color:#ff9b9b}.tip.ok{color:#7ce3a9}
+.perks{display:flex;flex-direction:column;gap:11px}
+.perk{display:flex;align-items:center;gap:11px;font-size:13px;color:var(--ink2)}
+.perk .dot{width:17px;height:17px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;
+ background:rgba(120,224,166,.14);border:1px solid rgba(120,224,166,.34)}
+.perk .dot svg{width:10px;height:10px;stroke:#7ce3a9;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.perk.pending .dot{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.14)}
+.perk.pending .dot svg{stroke:rgba(255,255,255,.3)}
+.perk b{color:#fff;font-weight:600}
+.foot{margin-top:34px;font-size:11.5px;line-height:1.9;color:rgba(255,255,255,.3);max-width:60ch}
+@media(max-width:560px){
+ .wrap{padding:20px 16px 64px}.top{margin-bottom:30px;gap:8px}.card{padding:18px 18px}
+ .top .brand{display:none}.top svg.mark{width:78px;height:20px}
+ .back{font-size:11.5px;padding:6px 11px}
+ .keyrow input{min-width:0;width:100%}.keyrow .btn{width:100%}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <svg class="mark" viewBox="0 0 132 32" fill="none" stroke="#fff" stroke-width="2.2"><circle cx="16" cy="16" r="9.5"/><path d="M45 8l14 16M59 8L45 24"/><path d="M79 25l8-17 8 17z" stroke-linejoin="round"/><rect x="102" y="7.5" width="16" height="16" rx="1.6"/></svg><span class="brand">PLAYSTATION WEB</span><span class="sp"></span>
+    <a class="back" href="../"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>返回主页</a>
+  </div>
+
+  <div class="kicker">Support</div>
+  <h1>支持作者</h1>
+  <p class="lead">PlayStation web 是个人作品，完全免费、没有广告。服务器、素材与熬夜的时间都由一个人承担。
+  如果你愿意支持它继续做下去，可以在爱发电发电，并由此获得一枚会员密钥。</p>
+
+  <div class="card">
+    <div class="h2">如何获得密钥</div>
+    <div class="steps">
+      <div class="step"><span class="n">1</span><div>
+        <b>打开爱发电主页</b>
+        <p>在爱发电搜索或直接访问下方的赞助页，任意金额都可以。</p></div></div>
+      <div class="step"><span class="n">2</span><div>
+        <b>发电并留下联系方式</b>
+        <p>发电时在备注里写上你的邮箱，或发电后私信我，方便把密钥发给你。</p></div></div>
+      <div class="step"><span class="n">3</span><div>
+        <b>收到一枚密钥</b>
+        <p>格式为 <code>PSWB-XXXXX-XXXXX</code>，一共 10 位字母与数字。复制它，回到本站激活即可。</p></div></div>
+    </div>
+    <a class="afd-go" href="https://afdian.com/a/apple-pc" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M12 21s-8-4.9-8-10.4A4.6 4.6 0 0112 7a4.6 4.6 0 018 3.6C20 16.1 12 21 12 21z"/></svg>
+      前往爱发电支持</a>
+  </div>
+
+  <div class="card">
+    <div class="h2">激活会员</div>
+    <div class="keyrow">
+      <input id="key" placeholder="PSWB-XXXXX-XXXXX" autocomplete="off" spellcheck="false" maxlength="20">
+      <button class="btn" id="go">激活</button>
+    </div>
+    <div class="tip" id="tip"></div>
+  </div>
+
+  <div class="card">
+    <div class="h2">会员权益</div>
+    <div class="perks">
+      <div class="perk"><span class="dot"><svg viewBox="0 0 24 24"><path d="M4 12l5 5 11-11"/></svg></span>
+        <div><b>创建账户</b> · 拥有自己的头像、昵称与独立成绩</div></div>
+      <div class="perk pending"><span class="dot"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span>
+        <div>更多权益正在开发，激活后自动生效，无需再次输入密钥</div></div>
+    </div>
+  </div>
+
+  <p class="foot">密钥只保存在这台设备的浏览器里，换设备或清除浏览器数据后需要重新激活。
+  激活状态不会上传到任何服务器。如果你觉得这个项目不值得付费，直接用访客账户游玩即可，所有游戏内容完全免费。</p>
+</div>
+<script>
+
+/* ---- PS5 系统音效（Web Audio 合成，无外部素材） ---- */
+var PS_SFX=(function(){
+  var ctx=null,master=null,muted=false;
+  try{muted=localStorage.getItem('psweb_mute')==='1'}catch(e){}
+  function ac(){
+    if(ctx){if(ctx.state==='suspended'){try{ctx.resume()}catch(e){}}return ctx}
+    var AC=window.AudioContext||window.webkitAudioContext;
+    if(!AC)return null;
+    try{ctx=new AC()}catch(e){return null}
+    master=ctx.createGain();
+    master.gain.value=muted?0:0.24;
+    master.connect(ctx.destination);
+    return ctx;
+  }
+  function tone(f,dur,type,vol,to,delay){
+    if(muted)return;
+    var c=ac();if(!c)return;
+    var t=c.currentTime+(delay||0);
+    var o=c.createOscillator(),g=c.createGain();
+    o.type=type||'sine';
+    o.frequency.setValueAtTime(f,t);
+    if(to)o.frequency.exponentialRampToValueAtTime(to,t+dur);
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.exponentialRampToValueAtTime(vol,t+0.006);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    o.connect(g);g.connect(master);
+    o.start(t);o.stop(t+dur+0.03);
+  }
+  function sweep(dur,vol,f1,f2){
+    if(muted)return;
+    var c=ac();if(!c)return;
+    var len=Math.floor(c.sampleRate*dur);
+    if(len<=0)return;
+    var buf=c.createBuffer(1,len,c.sampleRate),d=buf.getChannelData(0);
+    for(var i=0;i<len;i++)d[i]=(Math.random()*2-1)*(1-i/len);
+    var src=c.createBufferSource();src.buffer=buf;
+    var bp=c.createBiquadFilter();bp.type='bandpass';bp.Q.value=1.1;
+    var t=c.currentTime;
+    bp.frequency.setValueAtTime(f1,t);
+    bp.frequency.exponentialRampToValueAtTime(f2,t+dur);
+    var g=c.createGain();
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.exponentialRampToValueAtTime(vol,t+dur*0.26);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    src.connect(bp);bp.connect(g);g.connect(master);
+    src.start(t);src.stop(t+dur);
+  }
+  return {
+    unlock:function(){ac()},
+    tap:function(){tone(960,0.028,'sine',0.055)},
+    move:function(){tone(1240,0.042,'sine',0.085)},
+    hover:function(){tone(1520,0.026,'sine',0.04)},
+    confirm:function(){tone(784,0.07,'sine',0.16);tone(1175,0.1,'sine',0.12,null,0.045)},
+    back:function(){tone(660,0.075,'sine',0.14);tone(440,0.11,'sine',0.1,null,0.04)},
+    open:function(){tone(520,0.1,'triangle',0.13,780)},
+    close:function(){tone(700,0.1,'triangle',0.11,430)},
+    launch:function(){sweep(0.8,0.16,320,2800);tone(110,0.75,'sine',0.2,430);tone(220,0.5,'triangle',0.08,660,0.06)},
+    boot:function(){tone(92,1.5,'sine',0.2,300);tone(184,1.15,'triangle',0.075,560,0.12);sweep(1.25,0.05,180,1400)},
+    trophy:function(){var n=[523,659,784,1046];for(var i=0;i<n.length;i++)tone(n[i],0.3,'sine',0.13,null,i*0.09)},
+    error:function(){tone(200,0.09,'square',0.08);tone(160,0.14,'square',0.07,null,0.1)},
+    /* ---- 游戏内音效 ---- */
+    place:function(){tone(215,0.08,'triangle',0.13,145)},
+    pop:function(){tone(1180,0.07,'sine',0.09,1620)},
+    merge:function(v){var f=460+Math.min(6,Math.log(v||2)/Math.LN2)*72;tone(f,0.15,'sine',0.14,f*1.5)},
+    clearLine:function(n){var b=[659,784,988,1318],k=Math.max(1,Math.min(n||1,4));
+      for(var i=0;i<k;i++)tone(b[i],0.2,'sine',0.11,null,i*0.055)},
+    flip:function(){sweep(0.09,0.05,1100,3000)},
+    match:function(){tone(880,0.09,'sine',0.13);tone(1318,0.15,'sine',0.1,null,0.07)},
+    mismatch:function(){tone(330,0.11,'sine',0.09,220)},
+    eat:function(){tone(680,0.07,'square',0.06,1020)},
+    mark:function(){tone(1560,0.028,'sine',0.055)},
+    boom:function(){sweep(0.45,0.19,1000,80);tone(68,0.45,'sine',0.15,38)},
+    shoot:function(){tone(1500,0.08,'square',0.04,400);sweep(0.06,0.026,2600,900)},
+    hit:function(){tone(320,0.09,'square',0.055,120)},
+    win:function(){var n=[523,659,784,1046];for(var i=0;i<n.length;i++)tone(n[i],0.32,'sine',0.12,null,i*0.085)},
+    lose:function(){var n=[392,330,262,196];for(var i=0;i<n.length;i++)tone(n[i],0.26,'triangle',0.095,null,i*0.1)},
+    setMuted:function(v){muted=!!v;if(master)master.gain.value=muted?0:0.24;
+      try{localStorage.setItem('psweb_mute',muted?'1':'0')}catch(e){}},
+    isMuted:function(){return muted}
+  };
+})();
+
+
+var PS_AV_SHAPES=['circle','triangle','square','cross','star','diamond','ring','wave'];
+var PS_AV_COLORS=[['#3a9bec','#0a4d92'],['#b06ae0','#4a1470'],['#3fc38a','#0f5c3c'],['#ff9f45','#8a3c00'],
+                  ['#ff6b8b','#8c1030'],['#3ecfcf','#0a5151'],['#e8c341','#6b4a00'],['#8b96a8','#2a3140']];
+var PS_AV_PATH={
+ 'circle':'<circle cx="50" cy="50" r="17" fill="#fff" opacity=".92"/>',
+ 'triangle':'<path d="M50 30l19 34H31z" fill="#fff" opacity=".92"/>',
+ 'square':'<rect x="34" y="34" width="32" height="32" rx="6" fill="#fff" opacity=".92"/>',
+ 'cross':'<path d="M44 30h12v14h14v12H56v14H44V56H30V44h14z" fill="#fff" opacity=".92"/>',
+ 'star':'<path d="M50 28l7 17 18 1-14 12 5 18-16-10-16 10 5-18-14-12 18-1z" fill="#fff" opacity=".92"/>',
+ 'diamond':'<path d="M50 30l20 20-20 20-20-20z" fill="#fff" opacity=".92"/>',
+ 'ring':'<circle cx="50" cy="50" r="17" fill="none" stroke="#fff" stroke-width="7" opacity=".92"/>',
+ 'wave':'<path d="M30 44c7-8 14 8 21 0s14 8 21 0M30 58c7-8 14 8 21 0s14 8 21 0" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" opacity=".92"/>'
+};
+function PS_avatarHTML(i,uid){
+  i=((i|0)%8+8)%8;var sh=PS_AV_SHAPES[i],g='psav'+(uid||'')+i;
+  return '<svg viewBox="0 0 100 100"><defs><linearGradient id="'+g+'" x1="0" y1="0" x2="1" y2="1">'+
+    '<stop stop-color="'+PS_AV_COLORS[i][0]+'"/><stop offset="1" stop-color="'+PS_AV_COLORS[i][1]+'"/></linearGradient></defs>'+
+    '<rect width="100" height="100" rx="50" fill="url(#'+g+')"/>'+PS_AV_PATH[sh]+'</svg>';
+}
+function PS_users(){try{var a=JSON.parse(localStorage.getItem('psweb_users')||'[]');return Array.isArray(a)?a:[]}catch(e){return []}}
+function PS_saveUsers(a){try{localStorage.setItem('psweb_users',JSON.stringify(a))}catch(e){}}
+function PS_uid(){try{return localStorage.getItem('psweb_uid')||''}catch(e){return ''}}
+function PS_setUid(id){try{localStorage.setItem('psweb_uid',id)}catch(e){}}
+function PS_getUser(){
+  var a=PS_users(),id=PS_uid(),u=null,i;
+  if(id){for(i=0;i<a.length;i++){if(a[i].id===id)u=a[i]}}
+  if(!u&&a.length)u=a[0];
+  if(!u){
+    try{var old=JSON.parse(localStorage.getItem('psweb_user')||'null');
+      if(old){old.id='u0';PS_saveUsers([old]);PS_setUid('u0');u=old}
+    }catch(e){}
+  }
+  return u;
+}
+function PS_setUser(u){
+  var a=PS_users(),i,found=false;
+  if(!u.id)u.id='u'+Date.now();
+  for(i=0;i<a.length;i++){if(a[i].id===u.id){a[i]=u;found=true}}
+  if(!found)a.push(u);
+  PS_saveUsers(a);PS_setUid(u.id);
+  return u;
+}
+function PS_clearUser(){try{localStorage.removeItem('psweb_uid')}catch(e){}}
+/* ---- 会员与密钥 ---- */
+var PS_KA='23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+function PS_khash(s){var h=0x9e3779b1;for(var i=0;i<s.length;i++){h=(h*33+PS_KA.indexOf(s[i]))&0x7fffffff}return h}
+function PS_kmake(s1){var h=PS_khash(s1),o='';for(var i=0;i<5;i++){o+=PS_KA[h%32];h=Math.floor(h/32)+7}return o}
+function PS_keyValid(raw){
+  var k=String(raw||'').toUpperCase().replace(/[^0-9A-Z]/g,'');
+  if(k.indexOf('PSWB')===0)k=k.slice(4);
+  if(k.length!==10)return false;
+  for(var i=0;i<10;i++){if(PS_KA.indexOf(k[i])<0)return false}
+  return PS_kmake(k.slice(0,5))===k.slice(5);
+}
+function PS_vip(){try{return localStorage.getItem('psweb_vip')==='1'}catch(e){return false}}
+function PS_setVip(on){try{localStorage.setItem('psweb_vip',on?'1':'0')}catch(e){}}
+function PS_unlockWithKey(raw){
+  if(!PS_keyValid(raw))return false;
+  PS_setVip(true);
+  var u=PS_getUser();
+  if(u){u.vip=true;PS_setUser(u)}
+  return true;
+}
+/* 访客账户：设备无会员时唯一可用账户 */
+function PS_ensureGuest(){
+  var a=PS_users();
+  if(a.length)return a;
+  var g={id:'guest',name:'访客',avatar:7,created:0,vip:false,guest:true};
+  PS_saveUsers([g]);PS_setUid('guest');
+  return [g];
+}
+
+(function(){
+  var inp=document.getElementById('key'),btn=document.getElementById('go'),tip=document.getElementById('tip');
+  function say(msg,cls){tip.textContent=msg;tip.className='tip'+(cls?' '+cls:'')}
+  if(PS_vip()){
+    var row=document.querySelector('.keyrow');if(row)row.style.display='none';
+    say('这台设备已激活会员，回到设定里即可创建账户。','ok')}
+  function submit(){
+    var v=inp.value.trim();
+    if(!v)return say('请先粘贴密钥','err');
+    if(PS_unlockWithKey(v)){PS_SFX.trophy();say('激活成功，会员已开启。回到主页就能创建自己的账户了。','ok');
+      var row=document.querySelector('.keyrow');if(row)row.style.display='none'}
+    else{PS_SFX.error();say('密钥不正确，请检查是否有漏字或空格','err')}
+  }
+  btn.onclick=submit;
+  inp.addEventListener('keydown',function(e){if(e.key==='Enter')submit()});
+  ['pointerdown','keydown'].forEach(function(ev){document.addEventListener(ev,function once(){PS_SFX.unlock();
+    document.removeEventListener(ev,once)},false)});
+})();
+</script>
+</body>
+</html>

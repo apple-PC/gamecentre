@@ -88,7 +88,7 @@ button{font-family:inherit;cursor:pointer;color:inherit}
 .overlay .box p{color:var(--ink2);font-size:14px;margin-bottom:22px}
 .hidden{display:none!important}
 /* PS5 手柄按键提示条 */
-.hints{position:fixed;left:0;right:0;bottom:0;z-index:35;height:54px;display:flex;align-items:center;justify-content:center;gap:30px;
+.hints{position:fixed;left:0;right:0;bottom:30px;z-index:35;height:54px;display:flex;align-items:center;justify-content:center;gap:30px;
  background:linear-gradient(180deg,transparent,rgba(4,7,16,.92) 42%);font-size:11.5px;color:var(--ink2)}
 .hint{display:flex;align-items:center;gap:7px}
 .hint svg{width:17px;height:17px}
@@ -109,6 +109,40 @@ button{font-family:inherit;cursor:pointer;color:inherit}
 ::-webkit-scrollbar-thumb{background:rgba(100,135,200,.3);border-radius:9px}
 @media(max-width:520px){.sysbar{padding:0 14px}.sysbar .net{display:none}.stage{padding-top:18px}.hints{gap:12px}.hint span{display:none}}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+
+/* 爱发电：底部说明条 */
+.afd-bar{position:fixed;left:0;right:0;bottom:0;z-index:46;height:30px;display:flex;align-items:center;justify-content:center;
+ gap:6px;padding:0 14px;background:rgba(6,10,20,.97);border-top:1px solid rgba(255,138,61,.22);
+ font-size:11px;color:#c3cee4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;
+ transition:color 220ms var(--ease),border-color 220ms var(--ease)}
+.afd-bar:hover{color:#ffd0ab;border-color:rgba(255,138,61,.5)}
+.afd-bar b{color:#ff9d57;font-weight:600}
+.afd-bar .afd-heart{color:#ff7a3d;font-size:12px;line-height:1}
+.afd-bar .afd-arrow{color:#ff9d57;font-size:11px;opacity:.8}
+@media(max-width:520px){.afd-bar{font-size:10px;gap:5px}.afd-bar .afd-arrow{display:none}}
+/* 爱发电：首次弹窗 */
+.afd-modal{position:fixed;inset:0;z-index:92;background:rgba(3,5,12,.64);backdrop-filter:blur(10px);
+ display:none;align-items:center;justify-content:center;padding:20px}
+.afd-modal.on{display:flex;animation:afdIn 260ms var(--ease)}
+@keyframes afdIn{from{opacity:0}to{opacity:1}}
+.afd-card{width:min(400px,92vw);background:linear-gradient(160deg,#2b1709,#150b05 72%);
+ border:1px solid rgba(255,138,61,.34);border-radius:22px;padding:26px 24px 20px;position:relative;
+ box-shadow:0 30px 90px rgba(0,0,0,.78);text-align:center;animation:afdUp 300ms var(--ease)}
+@keyframes afdUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.afd-badge{display:inline-block;font-size:11px;letter-spacing:.04em;color:#ffb27a;
+ border:1px solid rgba(255,138,61,.4);background:rgba(255,138,61,.12);padding:4px 12px;border-radius:999px;margin-bottom:14px}
+.afd-card h3{font-size:19px;font-weight:650;color:#fff4ec;margin-bottom:10px}
+.afd-card p{font-size:13px;line-height:1.7;color:#c9b3a4;margin-bottom:20px}
+.afd-go{display:block;background:linear-gradient(135deg,#ff9a4d,#ff6a1a);color:#241004;font-weight:650;
+ font-size:13.5px;padding:12px;border-radius:12px;transition:transform 220ms var(--ease),filter 220ms var(--ease)}
+.afd-go:hover{transform:translateY(-1px);filter:brightness(1.06)}
+.afd-later{display:inline-block;background:none;border:none;color:#8b7a6e;font-size:12px;margin-top:12px;
+ cursor:pointer;font-family:inherit;padding:4px 8px}
+.afd-later:hover{color:#c9b3a4}
+.afd-close{position:absolute;top:10px;right:13px;background:none;border:none;color:#9c8878;font-size:22px;
+ line-height:1;cursor:pointer;padding:2px 4px}
+.afd-close:hover{color:#ffb27a}
 
 
 .gm{background:#e8c98f;border-radius:12px;position:relative;width:min(390px,92vw);aspect-ratio:1;margin:0 auto;
@@ -147,6 +181,19 @@ box-shadow:inset 0 0 30px rgba(0,0,0,.1)}
 <button class="cc-act" onclick="location.reload()">重新开始</button>
 <button class="cc-act" onclick="document.getElementById('cc').classList.remove('on')">继续游戏</button>
 </div></div></div>
+<div class="afd-bar" id="afdBar" role="complementary" aria-label="赞助支持">
+<span class="afd-heart">&#9829;</span><span>本站为个人作品，喜欢的话可以在 <b>爱发电</b> 支持我</span><span class="afd-arrow">&#8594;</span>
+</div>
+<div class="afd-modal" id="afdModal" role="dialog" aria-modal="true" aria-labelledby="afdTitle">
+ <div class="afd-card">
+  <button class="afd-close" id="afdClose" aria-label="关闭">&#215;</button>
+  <div class="afd-badge">&#9749; 爱发电</div>
+  <h3 id="afdTitle">喜欢这个网站吗？</h3>
+  <p>PlayStation web 是我业余时间做的小项目，完全免费、没有广告。如果它让你玩得开心，欢迎请我喝杯咖啡。</p>
+  <a class="afd-go" href="https://afdian.com/a/apple-pc" target="_blank" rel="noopener">前往爱发电支持 &#8594;</a>
+  <button class="afd-later" id="afdLater">以后再说</button>
+ </div>
+</div>
 <script>
 
 (function(){function tick(){var d=new Date(),e=document.getElementById('sysclock');
@@ -162,6 +209,21 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape')cc.classList
 function hiGet(k){try{return +(localStorage.getItem('gc_'+k)||0)}catch(e){return 0}}
 function hiSet(k,v){try{localStorage.setItem('gc_'+k,v)}catch(e){}}
 function setMsg(t){var m=document.getElementById('msg');if(m)m.textContent=t||''}
+
+
+(function(){var M=document.getElementById('afdModal'),B=document.getElementById('afdBar');
+if(!M)return;
+var KEY='afd_dismissed';
+function close(){M.classList.remove('on');try{localStorage.setItem(KEY,'1')}catch(e){}}
+function open(){M.classList.add('on')}
+var c=document.getElementById('afdClose'),l=document.getElementById('afdLater');
+if(c)c.onclick=close;if(l)l.onclick=close;
+M.onclick=function(e){if(e.target===M)close()};
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&M.classList.contains('on'))close()});
+if(B)B.onclick=function(){window.open('https://afdian.com/a/apple-pc','_blank','noopener')};
+var seen=false;try{seen=localStorage.getItem(KEY)==='1'}catch(e){}
+if(!seen)setTimeout(open,1200);
+})();
 
 
 var N=13,cv=document.getElementById('cv'),ctx=cv.getContext('2d'),cell=cv.width/(N+1),b,turn,over;

@@ -150,7 +150,7 @@ background:linear-gradient(180deg,#1684de,#0064b4);box-shadow:0 10px 26px -8px r
 .quick{width:66px;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--ink2);font-size:11px;transition:color 220ms var(--ease)}
 .quick:hover{color:#fff}
 .quick svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-.hints{position:fixed;left:0;right:0;bottom:0;z-index:35;height:54px;display:flex;align-items:center;justify-content:center;gap:30px;
+.hints{position:fixed;left:0;right:0;bottom:30px;z-index:35;height:54px;display:flex;align-items:center;justify-content:center;gap:30px;
 background:linear-gradient(180deg,transparent,rgba(4,7,16,.92) 42%);font-size:11.5px;color:var(--ink2)}
 .hint{display:flex;align-items:center;gap:7px}
 .hint svg{width:17px;height:17px}
@@ -162,6 +162,40 @@ background:linear-gradient(180deg,transparent,rgba(4,7,16,.92) 42%);font-size:11
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 ::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-track{background:#070a14}
 ::-webkit-scrollbar-thumb{background:rgba(100,135,200,.3);border-radius:9px}
+
+/* 爱发电：底部说明条 */
+.afd-bar{position:fixed;left:0;right:0;bottom:0;z-index:46;height:30px;display:flex;align-items:center;justify-content:center;
+ gap:6px;padding:0 14px;background:rgba(6,10,20,.97);border-top:1px solid rgba(255,138,61,.22);
+ font-size:11px;color:#c3cee4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;
+ transition:color 220ms var(--ease),border-color 220ms var(--ease)}
+.afd-bar:hover{color:#ffd0ab;border-color:rgba(255,138,61,.5)}
+.afd-bar b{color:#ff9d57;font-weight:600}
+.afd-bar .afd-heart{color:#ff7a3d;font-size:12px;line-height:1}
+.afd-bar .afd-arrow{color:#ff9d57;font-size:11px;opacity:.8}
+@media(max-width:520px){.afd-bar{font-size:10px;gap:5px}.afd-bar .afd-arrow{display:none}}
+/* 爱发电：首次弹窗 */
+.afd-modal{position:fixed;inset:0;z-index:92;background:rgba(3,5,12,.64);backdrop-filter:blur(10px);
+ display:none;align-items:center;justify-content:center;padding:20px}
+.afd-modal.on{display:flex;animation:afdIn 260ms var(--ease)}
+@keyframes afdIn{from{opacity:0}to{opacity:1}}
+.afd-card{width:min(400px,92vw);background:linear-gradient(160deg,#2b1709,#150b05 72%);
+ border:1px solid rgba(255,138,61,.34);border-radius:22px;padding:26px 24px 20px;position:relative;
+ box-shadow:0 30px 90px rgba(0,0,0,.78);text-align:center;animation:afdUp 300ms var(--ease)}
+@keyframes afdUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.afd-badge{display:inline-block;font-size:11px;letter-spacing:.04em;color:#ffb27a;
+ border:1px solid rgba(255,138,61,.4);background:rgba(255,138,61,.12);padding:4px 12px;border-radius:999px;margin-bottom:14px}
+.afd-card h3{font-size:19px;font-weight:650;color:#fff4ec;margin-bottom:10px}
+.afd-card p{font-size:13px;line-height:1.7;color:#c9b3a4;margin-bottom:20px}
+.afd-go{display:block;background:linear-gradient(135deg,#ff9a4d,#ff6a1a);color:#241004;font-weight:650;
+ font-size:13.5px;padding:12px;border-radius:12px;transition:transform 220ms var(--ease),filter 220ms var(--ease)}
+.afd-go:hover{transform:translateY(-1px);filter:brightness(1.06)}
+.afd-later{display:inline-block;background:none;border:none;color:#8b7a6e;font-size:12px;margin-top:12px;
+ cursor:pointer;font-family:inherit;padding:4px 8px}
+.afd-later:hover{color:#c9b3a4}
+.afd-close{position:absolute;top:10px;right:13px;background:none;border:none;color:#9c8878;font-size:22px;
+ line-height:1;cursor:pointer;padding:2px 4px}
+.afd-close:hover{color:#ffb27a}
+
 </style>
 </head>
 <body>
@@ -311,6 +345,19 @@ background:linear-gradient(180deg,transparent,rgba(4,7,16,.92) 42%);font-size:11
   <div class="hint"><svg class="t" viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linejoin="round"><path d="M12 3l9 17H3z"/></svg><span>选项</span></div>
   <div class="hint"><svg class="s" viewBox="0 0 24 24" fill="none" stroke-width="2.4"><rect x="4" y="4" width="16" height="16" rx="2"/></svg><span>视图</span></div>
 </div>
+<div class="afd-bar" id="afdBar" role="complementary" aria-label="赞助支持">
+<span class="afd-heart">&#9829;</span><span>本站为个人作品，喜欢的话可以在 <b>爱发电</b> 支持我</span><span class="afd-arrow">&#8594;</span>
+</div>
+<div class="afd-modal" id="afdModal" role="dialog" aria-modal="true" aria-labelledby="afdTitle">
+ <div class="afd-card">
+  <button class="afd-close" id="afdClose" aria-label="关闭">&#215;</button>
+  <div class="afd-badge">&#9749; 爱发电</div>
+  <h3 id="afdTitle">喜欢这个网站吗？</h3>
+  <p>PlayStation web 是我业余时间做的小项目，完全免费、没有广告。如果它让你玩得开心，欢迎请我喝杯咖啡。</p>
+  <a class="afd-go" href="https://afdian.com/a/apple-pc" target="_blank" rel="noopener">前往爱发电支持 &#8594;</a>
+  <button class="afd-later" id="afdLater">以后再说</button>
+ </div>
+</div>
 <script>
 var KEEP=["2048", "snake", "minesweeper", "tetris", "tictactoe", "memory", "gomoku", "spaceshooter"], META={"2048": {"en": "2048", "desc": "合并相同数字，冲击 2048", "c1": "#f59e0b", "c2": "#7c3a00"}, "snake": {"en": "SNAKE", "desc": "吞噬、生长、别撞墙", "c1": "#34c759", "c2": "#0b5c2e"}, "minesweeper": {"en": "MINES", "desc": "经典扫雷，找出所有地雷", "c1": "#0a84ff", "c2": "#063a80"}, "tetris": {"en": "TETRIS", "desc": "旋转方块，消除整行", "c1": "#5e5ce6", "c2": "#2b2480"}, "tictactoe": {"en": "TICTAC", "desc": "与 AI 对决，三连线获胜", "c1": "#ff3b30", "c2": "#8a140d"}, "memory": {"en": "MEMORY", "desc": "翻开卡牌，找到所有配对", "c1": "#af52de", "c2": "#5c1a80"}, "gomoku": {"en": "GOMOKU", "desc": "五子连珠，挑战电脑 AI", "c1": "#ff9500", "c2": "#8a4a00"}, "spaceshooter": {"en": "SHOOTER", "desc": "驾驶战机，击落来袭敌机", "c1": "#0070d1", "c2": "#08265e"}};
 function tick(){var d=new Date(),h=d.getHours(),m=('0'+d.getMinutes()).slice(-2);
@@ -361,6 +408,21 @@ document.addEventListener('keydown',function(e){
  if(e.key==='ArrowLeft'&&!detail.classList.contains('on')){
    var ns2=Array.prototype.slice.call(document.querySelectorAll('.nav-ico')),j=ns2.indexOf(document.activeElement);
    if(j>0){ns2[j-1].focus();showView(ns2[j-1].dataset.view)}}});
+
+(function(){var M=document.getElementById('afdModal'),B=document.getElementById('afdBar');
+if(!M)return;
+var KEY='afd_dismissed';
+function close(){M.classList.remove('on');try{localStorage.setItem(KEY,'1')}catch(e){}}
+function open(){M.classList.add('on')}
+var c=document.getElementById('afdClose'),l=document.getElementById('afdLater');
+if(c)c.onclick=close;if(l)l.onclick=close;
+M.onclick=function(e){if(e.target===M)close()};
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&M.classList.contains('on'))close()});
+if(B)B.onclick=function(){window.open('https://afdian.com/a/apple-pc','_blank','noopener')};
+var seen=false;try{seen=localStorage.getItem(KEY)==='1'}catch(e){}
+if(!seen)setTimeout(open,1200);
+})();
+
 </script>
 </body>
 </html>
